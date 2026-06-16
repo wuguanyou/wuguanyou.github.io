@@ -9,7 +9,8 @@
         * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
         
         body {
-            background-image: url('bg_arena.png');
+            /* 設定競技場大廳背景圖 */
+            background-image: url('image_4b6a37.jpg');
             background-size: cover; background-position: center;
             width: 100vw; height: 100vh; overflow: hidden;
             font-family: 'Noto Serif TC', serif; color: #ffffff;
@@ -21,26 +22,31 @@
 
         /* --- 頂部資訊列 --- */
         header { position: absolute; top: 20px; left: 20px; right: 20px; display: flex; justify-content: space-between; align-items: flex-start; z-index: 10; }
+        
         .player-profile { display: flex; align-items: center; gap: 15px; cursor: pointer; transition: transform 0.2s; }
         .player-profile:hover { transform: scale(1.05); }
         
-        /* 頭像樣式更新為支援圖片 */
+        /* 支援動態更換的頭像樣式 */
         .avatar { 
             width: 60px; height: 60px; border-radius: 50%; 
-            border: 2px solid #a0c0ff; background: rgba(10, 20, 40, 0.8); 
-            object-fit: cover;
+            border: 2px solid #ffd700; background: rgba(10, 20, 40, 0.8); 
+            object-fit: cover; box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
         }
         
         .player-info { display: flex; flex-direction: column; }
+        .player-level { font-size: 14px; color: #ffd700; font-weight: bold; }
         .player-name { font-size: 18px; font-weight: bold; letter-spacing: 2px; text-shadow: 0 0 5px rgba(0,0,0,0.8); }
-        .player-id { font-size: 12px; color: #a0c0ff; letter-spacing: 1px; margin-top: 2px; }
 
         .top-right-menu { display: flex; gap: 20px; align-items: center; }
         .resource-item { display: flex; gap: 8px; background: rgba(10, 15, 30, 0.6); padding: 8px 15px; border-radius: 20px; font-size: 16px; border: 1px solid rgba(255, 255, 255, 0.2); }
         .sys-btn { background: rgba(10, 15, 30, 0.6); border: 1px solid rgba(255, 255, 255, 0.2); color: white; width: 45px; height: 45px; border-radius: 50%; font-size: 20px; cursor: pointer; transition: all 0.3s; }
         .sys-btn:hover { background: rgba(255, 215, 0, 0.2); border-color: #ffd700; transform: scale(1.1); }
 
-        /* --- 中央按鈕區 --- */
+        /* --- 左上角返回大廳導覽 --- */
+        .back-nav { position: absolute; top: 100px; left: 30px; color: rgba(255,255,255,0.5); font-size: 14px; cursor: pointer; transition: 0.2s; z-index: 10; }
+        .back-nav:hover { color: #fff; }
+
+        /* --- 中央核心按鈕區 (4個主要功能) --- */
         .center-menu {
             position: absolute; top: 55%; left: 50%; transform: translate(-50%, -50%);
             display: flex; flex-direction: column; gap: 15px; width: 450px;
@@ -58,11 +64,7 @@
         .btn-subtitle { font-size: 10px; color: #a0c0ff; letter-spacing: 4px; }
         .btn-side-icon { font-size: 24px; color: #ffd700; opacity: 0.8; }
 
-        /* 左上角返回按鈕 */
-        .back-nav { position: absolute; top: 100px; left: 30px; color: rgba(255,255,255,0.5); font-size: 14px; cursor: pointer; transition: 0.2s; }
-        .back-nav:hover { color: #fff; }
-
-        /* ================= 房間列表彈出視窗 ================= */
+        /* ================= 房間列表彈出視窗 (Modal) ================= */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             background: rgba(0, 0, 15, 0.7); backdrop-filter: blur(8px);
@@ -102,6 +104,7 @@
 
         .empty-msg { text-align: center; color: #a0c0ff; padding: 30px 0; font-size: 14px; letter-spacing: 2px; }
 
+        /* 自訂美化滾動條 */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); border-radius: 10px; }
         ::-webkit-scrollbar-thumb { background: #5bc0eb; border-radius: 10px; }
@@ -110,16 +113,16 @@
 <body>
 
     <header>
-        <div class="player-profile">
-            <img src="avatars/avatar1.jpg" class="avatar" id="arena-avatar" alt="玩家頭像" onerror="this.src=''">
+        <div class="player-profile" onclick="goBack()">
+            <img src="avatars/avatar1.png" class="avatar" id="arena-avatar" alt="玩家頭像" onerror="this.src='avatars/avatar1.png'">
             <div class="player-info">
-                <span class="player-name">星之觀測者 ✦</span>
-                <span class="player-id">觀測者編號: 102938</span>
+                <span class="player-level">Lv.80</span>
+                <span class="player-name" id="arena-username">星之觀測者</span>
             </div>
         </div>
         <div class="top-right-menu">
-            <div class="resource-item">🪙 128,450 +</div>
-            <div class="resource-item">💎 8,920 +</div>
+            <div class="resource-item">🪙 <span id="arena-coins">128,450</span></div>
+            <div class="resource-item">💎 <span id="arena-diamonds">8,920</span></div>
             <button class="sys-btn">⚙️</button>
         </div>
     </header>
@@ -165,22 +168,26 @@
     </div>
 
     <script>
-        // === 網頁載入時，讀取從 game.html 設定好的頭像 ===
+        // === 網頁載入時，從 localStorage 讀取大廳同步過來的所有資料 ===
         window.onload = function() {
+            // 1. 同步玩家頭像
             const savedAvatar = localStorage.getItem('playerAvatar');
-    if (savedAvatar) {
-        document.getElementById('arena-avatar').src = savedAvatar;
-    }
-    
-    // 新增：同步名字 (記得去 arena.html 的名字標籤加上 id="arena-username")
-    const savedName = localStorage.getItem('playerName');
-    if (savedName) {
-        const nameEl = document.getElementById('arena-username');
-        if (nameEl) nameEl.innerText = savedName;
-    }
-};
+            if (savedAvatar) {
+                document.getElementById('arena-avatar').src = savedAvatar;
+            }
+            
+            // 2. 同步玩家名字
+            const savedName = localStorage.getItem('playerName');
+            if (savedName) {
+                document.getElementById('arena-username').innerText = savedName;
+            }
 
-        // === WebSocket 連線設定 ===
+            // 3. 同步金幣與鑽石數量
+            document.getElementById('arena-coins').innerText = localStorage.getItem('playerCoins') || "128,450";
+            document.getElementById('arena-diamonds').innerText = localStorage.getItem('playerDiamonds') || "8,920";
+        };
+
+        // === WebSocket 伺服器連線設定 ===
         const ws = new WebSocket('ws://localhost:8765');
 
         ws.onopen = () => { console.log('✅ 成功連接到星宿伺服器！'); };
@@ -201,6 +208,7 @@
             }
         };
 
+        // === 動態更新房間列表彈窗 UI ===
         function updateRoomListUI(rooms) {
             const container = document.getElementById('roomContainer');
             container.innerHTML = ''; 
@@ -224,6 +232,8 @@
             });
         }
 
+        // === 遊戲按鈕互動功能邏輯 ===
+        
         function goBack() {
             document.body.style.opacity = 0;
             setTimeout(() => { window.location.href = 'game.html'; }, 500);
@@ -231,26 +241,26 @@
 
         function startMatchmaking() {
             if (ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ action: "match" }));
-            else alert("伺服器未連線。");
+            else alert("伺服器未連線。請確認 Python 伺服器是否在背景執行中。");
         }
 
         function createRoom() {
             if (ws.readyState === WebSocket.OPEN) {
-                const pwd = prompt("為您的房間取個名稱或密碼：");
+                const pwd = prompt("為您的私人房間取個名稱或設定密碼：");
                 if (pwd && pwd.trim() !== "") {
                     ws.send(JSON.stringify({ action: "create_room", password: pwd.trim() }));
                 }
             } else alert("伺服器未連線。");
         }
 
-        // 點擊列表的加入按鈕
+        // 點擊清單中的加入按鈕
         function joinRoom(roomName) {
             if (ws.readyState === WebSocket.OPEN) {
                 ws.send(JSON.stringify({ action: "join_room", password: roomName }));
             }
         }
 
-        // === 新增：手動輸入密碼加入私人房間 ===
+        // 手動輸入密碼加入房間
         function joinPrivateRoom() {
             if (ws.readyState === WebSocket.OPEN) {
                 const pwd = prompt("請輸入朋友的房間名稱或密碼：");
@@ -262,6 +272,7 @@
             }
         }
 
+        // === 彈出視窗顯示控制 ===
         function openRoomList() {
             const modal = document.getElementById('roomModal');
             const card = document.getElementById('roomCard');
