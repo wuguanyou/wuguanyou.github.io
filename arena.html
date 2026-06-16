@@ -156,7 +156,29 @@
         }
 
         function startMatchmaking() {
-            alert("🔍 尋找對手中...\n(這裡之後可以串接 Python WebSocket 或 Socket.io 進行真實連線配對)");
+            // 建立連線，指向剛才 Python 開啟的 8765 port
+const ws = new WebSocket('ws://localhost:8765');
+
+// 當成功連上伺服器時觸發
+ws.onopen = () => {
+    console.log('✅ 成功連接到星宿伺服器！');
+};
+
+// 當收到伺服器回傳的訊息時觸發
+ws.onmessage = (event) => {
+    alert(event.data);
+};
+
+// 覆蓋原本的配對函數
+function startMatchmaking() {
+    if (ws.readyState === WebSocket.OPEN) {
+        // 送出資料給 Python 伺服器
+        ws.send("請求進行玩家配對");
+        console.log("已送出配對請求。");
+    } else {
+        alert("伺服器未開啟，請確認 Python 腳本是否正在運行。");
+    }
+}
         }
 
         function createRoom() {
