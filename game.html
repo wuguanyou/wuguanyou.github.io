@@ -9,7 +9,6 @@
         * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
         
         body {
-            /* 設定大廳背景圖 */
             background-image: url('bg_lobby.png');
             background-size: cover; background-position: center;
             width: 100vw; height: 100vh; overflow: hidden;
@@ -30,12 +29,10 @@
         }
         .player-profile:hover { transform: scale(1.05); border-color: rgba(255, 215, 0, 0.8); }
         
-        /* 左上角小頭像 */
         .avatar { 
             width: 60px; height: 60px; border-radius: 50%; 
             border: 2px solid #ffd700; background: #fff; 
-            object-fit: cover; /* 確保圖片不變形填滿圓形 */
-            box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+            object-fit: cover; box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
         }
 
         .player-level { font-size: 14px; color: #ffd700; font-weight: bold; }
@@ -59,87 +56,98 @@
         .card-title { font-size: 26px; font-weight: 900; letter-spacing: 4px; margin-bottom: 8px; text-shadow: 0 2px 5px rgba(0,0,0,0.8); }
         .card-subtitle { font-size: 13px; color: #a0c0ff; letter-spacing: 2px; }
 
-        /* --- 返回按鈕 --- */
         .back-home { position: absolute; bottom: 20px; left: 20px; background: transparent; color: rgba(255,255,255,0.5); border: none; cursor: pointer; font-size: 16px; z-index: 10; }
         .back-home:hover { color: white; }
 
-        /* ================= 玩家名片彈出視窗 (Modal) ================= */
+        /* ================= 玩家名片彈出視窗 ================= */
         .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100vw; height: 100vh;
-            background: rgba(0, 0, 15, 0.7);
-            backdrop-filter: blur(8px);
-            display: none; /* 預設隱藏 */
-            justify-content: center;
-            align-items: center;
-            z-index: 100; /* 確保浮在最上層 */
-            opacity: 0;
-            transition: opacity 0.3s ease;
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0, 0, 15, 0.7); backdrop-filter: blur(8px);
+            display: none; justify-content: center; align-items: center;
+            z-index: 100; opacity: 0; transition: opacity 0.3s ease;
         }
 
         .profile-card {
-            width: 600px;
-            background: linear-gradient(135deg, rgba(20, 30, 60, 0.95), rgba(10, 15, 30, 0.95));
-            border: 2px solid #5bc0eb;
-            border-radius: 15px;
-            padding: 30px;
+            width: 600px; background: linear-gradient(135deg, rgba(20, 30, 60, 0.95), rgba(10, 15, 30, 0.95));
+            border: 2px solid #5bc0eb; border-radius: 15px; padding: 30px;
             box-shadow: 0 0 30px rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(100, 150, 255, 0.2);
-            position: relative;
-            transform: translateY(20px);
-            transition: transform 0.3s ease;
+            position: relative; transform: translateY(20px); transition: transform 0.3s ease;
         }
 
-        /* 關閉按鈕 */
-        .close-btn {
-            position: absolute;
-            top: 15px; right: 20px;
-            background: transparent; border: none;
-            color: #a0c0ff; font-size: 24px; cursor: pointer;
-            transition: 0.2s;
-        }
+        .close-btn { position: absolute; top: 15px; right: 20px; background: transparent; border: none; color: #a0c0ff; font-size: 24px; cursor: pointer; transition: 0.2s; }
         .close-btn:hover { color: #fff; transform: scale(1.2); }
 
-        /* 名片上半部：大頭貼與名稱 */
-        .profile-header {
-            display: flex; align-items: center; gap: 25px;
-            border-bottom: 1px solid rgba(150, 180, 255, 0.3);
-            padding-bottom: 20px; margin-bottom: 20px;
+        .profile-header { display: flex; align-items: center; gap: 25px; border-bottom: 1px solid rgba(150, 180, 255, 0.3); padding-bottom: 20px; margin-bottom: 20px; }
+        
+        /* 新增：名片大頭貼的外框容器與 Hover 編輯特效 */
+        .profile-avatar-wrapper {
+            position: relative;
+            width: 100px; height: 100px;
+            cursor: pointer;
+        }
+        
+        .profile-avatar-large {
+            width: 100%; height: 100%; border-radius: 50%; border: 3px solid #ffd700; background: #fff; 
+            object-fit: cover; box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+            transition: filter 0.2s;
         }
 
-        /* 彈出名片裡的大頭像 */
-        .profile-avatar-large {
-            width: 100px; height: 100px; border-radius: 50%; 
-            border: 3px solid #ffd700; background: #fff; 
-            object-fit: cover;
-            box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+        /* 移上去時顯示發光的「編輯」字樣 */
+        .profile-avatar-wrapper::after {
+            content: "修改形象";
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 10, 0.6); border-radius: 50%;
+            display: flex; justify-content: center; align-items: center;
+            color: #ffd700; font-size: 12px; font-weight: bold; letter-spacing: 1px;
+            opacity: 0; transition: opacity 0.2s;
+            border: 3px solid #5bc0eb; box-shadow: 0 0 15px #5bc0eb;
         }
+        .profile-avatar-wrapper:hover::after { opacity: 1; }
+        .profile-avatar-wrapper:hover .profile-avatar-large { filter: blur(1px); }
 
         .profile-details h2 { font-size: 28px; letter-spacing: 3px; margin-bottom: 5px; text-shadow: 0 2px 5px rgba(0,0,0,0.8); }
         .profile-uid { color: #a0c0ff; font-size: 14px; letter-spacing: 1px; margin-bottom: 10px; }
 
-        /* 經驗值條 */
         .exp-container { width: 300px; }
         .exp-text { display: flex; justify-content: space-between; font-size: 12px; color: #ffd700; margin-bottom: 5px; }
         .exp-bar-bg { width: 100%; height: 8px; background: rgba(0,0,0,0.5); border-radius: 4px; overflow: hidden; border: 1px solid rgba(255,255,255,0.2); }
         .exp-bar-fill { width: 75%; height: 100%; background: linear-gradient(to right, #ffd700, #ffaa00); }
 
-        /* 名片下半部：數據統計 */
-        .stats-grid {
-            display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; text-align: center;
-        }
-        .stat-box {
-            background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(150, 180, 255, 0.2);
-            border-radius: 8px; padding: 15px 10px;
-        }
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; text-align: center; margin-bottom: 0px; }
+        .stat-box { background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(150, 180, 255, 0.2); border-radius: 8px; padding: 15px 10px; }
         .stat-value { font-size: 24px; font-weight: bold; color: #fff; margin-bottom: 5px; }
         .stat-label { font-size: 12px; color: #a0c0ff; letter-spacing: 2px; }
+
+        /* --- 修正：更換頭像區域改為預設隱藏，帶有彈出動畫 --- */
+        .avatar-selection-area {
+            background: rgba(0, 0, 0, 0.5); border-radius: 10px; padding: 15px;
+            border: 1px dashed rgba(150, 180, 255, 0.4); margin-top: 25px;
+            display: none; /* 預設隱藏，點擊頭像後觸發 */
+            animation: slideDown 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+        
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .avatar-selection-title { font-size: 14px; color: #ffd700; margin-bottom: 12px; letter-spacing: 2px; text-align: center; font-weight: bold; }
+        .avatar-list { display: flex; gap: 20px; justify-content: center; padding-bottom: 5px; }
+        
+        .avatar-option {
+            width: 65px; height: 65px; border-radius: 50%; object-fit: cover;
+            border: 2px solid transparent; cursor: pointer; transition: all 0.2s;
+            opacity: 0.5;
+        }
+        .avatar-option:hover { opacity: 1; transform: scale(1.1); border-color: #5bc0eb; }
+        .avatar-option.selected { border-color: #ffd700; opacity: 1; box-shadow: 0 0 15px rgba(255,215,0,0.6); transform: scale(1.05); }
     </style>
 </head>
 <body>
     
     <header>
         <div class="player-profile" onclick="openProfile()">
-            <img src="avatar.jpg" class="avatar" alt="玩家頭像">
+            <img src="avatars/avatar1.jpg" class="avatar" id="main-avatar" alt="玩家頭像" onerror="this.src=''">
             <div style="display: flex; flex-direction: column;">
                 <span class="player-level">Lv.80</span>
                 <span class="player-name">星之觀測者</span>
@@ -148,30 +156,22 @@
         <div class="top-right-menu">
             <div class="resource-item">🪙 128,450 +</div>
             <div class="resource-item">💎 8,920 +</div>
-            <button class="sys-btn" onclick="alert('開啟設定')">⚙️</button>
+            <button class="sys-btn">⚙️</button>
         </div>
     </header>
 
     <div class="cards-container">
         <div class="action-card" onclick="enterArena()">
-            <div class="card-icon">✧</div>
-            <div class="card-title">對戰配對</div>
-            <div class="card-subtitle">進入星辰競技場</div>
+            <div class="card-icon">✧</div><div class="card-title">對戰配對</div><div class="card-subtitle">進入星辰競技場</div>
         </div>
         <div class="action-card" onclick="alert('進入卡牌編輯')">
-            <div class="card-icon">◈</div>
-            <div class="card-title">卡牌編輯</div>
-            <div class="card-subtitle">組建專屬卡組</div>
+            <div class="card-icon">◈</div><div class="card-title">卡牌編輯</div><div class="card-subtitle">組建專屬卡組</div>
         </div>
         <div class="action-card" onclick="alert('進入星宿召喚')">
-            <div class="card-icon">✦</div>
-            <div class="card-title">星宿召喚</div>
-            <div class="card-subtitle">召喚星辰使徒</div>
+            <div class="card-icon">✦</div><div class="card-title">星宿召喚</div><div class="card-subtitle">召喚星辰使徒</div>
         </div>
         <div class="action-card" onclick="alert('開啟圖鑑')">
-            <div class="card-icon">❂</div>
-            <div class="card-title">圖鑑</div>
-            <div class="card-subtitle">查看收集圖鑑</div>
+            <div class="card-icon">❂</div><div class="card-title">圖鑑</div><div class="card-subtitle">查看收集圖鑑</div>
         </div>
     </div>
 
@@ -182,82 +182,108 @@
             <button class="close-btn" onclick="closeProfile()">✖</button>
             
             <div class="profile-header">
-                <img src="avatar.jpg" class="profile-avatar-large" alt="玩家頭像">
+                <div class="profile-avatar-wrapper" onclick="toggleAvatarSelection()">
+                    <img src="avatars/avatar1.jpg" class="profile-avatar-large" id="modal-avatar" alt="玩家頭像" onerror="this.src=''">
+                </div>
                 <div class="profile-details">
                     <h2>星之觀測者</h2>
                     <div class="profile-uid">UID: 1029384756</div>
-                    
                     <div class="exp-container">
-                        <div class="exp-text">
-                            <span>Lv.80</span>
-                            <span>24,500 / 30,000 EXP</span>
-                        </div>
-                        <div class="exp-bar-bg">
-                            <div class="exp-bar-fill"></div>
-                        </div>
+                        <div class="exp-text"><span>Lv.80</span><span>24,500 / 30,000 EXP</span></div>
+                        <div class="exp-bar-bg"><div class="exp-bar-fill"></div></div>
                     </div>
                 </div>
             </div>
 
             <div class="stats-grid">
-                <div class="stat-box">
-                    <div class="stat-value">128</div>
-                    <div class="stat-label">進行對局</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-value" style="color: #44cc44;">68%</div>
-                    <div class="stat-label">競技勝率</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-value" style="color: #ffd700;">42/50</div>
-                    <div class="stat-label">星宿收集</div>
+                <div class="stat-box"><div class="stat-value">128</div><div class="stat-label">進行對局</div></div>
+                <div class="stat-box"><div class="stat-value" style="color: #44cc44;">68%</div><div class="stat-label">競技勝率</div></div>
+                <div class="stat-box"><div class="stat-value" style="color: #ffd700;">42/50</div><div class="stat-label">星宿收集</div></div>
+            </div>
+
+            <div class="avatar-selection-area" id="avatarSelector">
+                <div class="avatar-selection-title">✦ 選擇觀測者新形象 ✦</div>
+                <div class="avatar-list">
+                    <img src="avatars/avatar1.jpg" class="avatar-option selected" onclick="changeAvatar('avatars/avatar1.jpg', this)">
+                    <img src="avatars/avatar2.jpg" class="avatar-option" onclick="changeAvatar('avatars/avatar2.jpg', this)">
+                    <img src="avatars/avatar3.jpg" class="avatar-option" onclick="changeAvatar('avatars/avatar3.jpg', this)">
                 </div>
             </div>
         </div>
     </div>
 
     <script>
+        // === 初始化：載入記憶的頭像 ===
+        window.onload = function() {
+            const savedAvatar = localStorage.getItem('playerAvatar');
+            if (savedAvatar) {
+                document.getElementById('main-avatar').src = savedAvatar;
+                document.getElementById('modal-avatar').src = savedAvatar;
+                
+                document.querySelectorAll('.avatar-option').forEach(img => {
+                    if (img.getAttribute('src') === savedAvatar) img.classList.add('selected');
+                    else img.classList.remove('selected');
+                });
+            }
+        };
+
+        // === 控制頭像選擇庫的展開/收合 ===
+        function toggleAvatarSelection() {
+            const selector = document.getElementById('avatarSelector');
+            if (selector.style.display === 'block') {
+                selector.style.display = 'none';
+            } else {
+                selector.style.display = 'block';
+            }
+        }
+
+        // === 更換頭像邏輯 ===
+        function changeAvatar(imagePath, element) {
+            document.getElementById('main-avatar').src = imagePath;
+            document.getElementById('modal-avatar').src = imagePath;
+            
+            localStorage.setItem('playerAvatar', imagePath);
+
+            document.querySelectorAll('.avatar-option').forEach(img => img.classList.remove('selected'));
+            element.classList.add('selected');
+            
+            // 選擇完畢後自動收起選擇庫
+            setTimeout(() => { toggleAvatarSelection(); }, 200);
+        }
+
         // === 頁面跳轉邏輯 ===
-        
         function enterArena() {
             document.body.style.opacity = 0;
-            setTimeout(() => {
-                window.location.href = 'arena.html';
-            }, 500);
+            setTimeout(() => { window.location.href = 'arena.html'; }, 500);
         }
 
         function goBack() {
             document.body.style.opacity = 0;
-            setTimeout(() => {
-                window.location.href = 'index.html';
-            }, 500);
+            setTimeout(() => { window.location.href = 'index.html'; }, 500);
         }
 
-        // === 玩家名片彈出視窗邏輯 ===
-
+        // === 玩家名片開關邏輯 ===
         function openProfile() {
             const modal = document.getElementById('profileModal');
             const card = document.getElementById('profileCard');
-            
             modal.style.display = 'flex'; 
-            
-            setTimeout(() => {
-                modal.style.opacity = '1';
-                card.style.transform = 'translateY(0)';
-            }, 10);
+            setTimeout(() => { modal.style.opacity = '1'; card.style.transform = 'translateY(0)'; }, 10);
         }
 
         function closeProfile() {
             const modal = document.getElementById('profileModal');
             const card = document.getElementById('profileCard');
+            const selector = document.getElementById('avatarSelector');
             
             modal.style.opacity = '0';
             card.style.transform = 'translateY(20px)';
             
             setTimeout(() => {
                 modal.style.display = 'none';
+                selector.style.display = 'none'; // 關閉個人資料時，順便把頭像庫也重設為隱藏
             }, 300);
         }
     </script>
 </body>
+</html>
 </html>
