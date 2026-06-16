@@ -159,27 +159,41 @@
             // 建立連線，指向剛才 Python 開啟的 8765 port
 const ws = new WebSocket('ws://localhost:8765');
 
-// 當成功連上伺服器時觸發
 ws.onopen = () => {
     console.log('✅ 成功連接到星宿伺服器！');
 };
 
-// 當收到伺服器回傳的訊息時觸發
+// 負責接收伺服器傳來的廣播
 ws.onmessage = (event) => {
-    alert(event.data);
+    // 解析 JSON 資料
+    const data = JSON.parse(event.data);
+    
+    // 根據 action 標籤決定網頁要做出什麼反應
+    if (data.action === "waiting") {
+        alert("⏳ 正在尋找對手，請稍候...");
+        // 這裡未來可以讓配對按鈕顯示轉圈圈動畫
+        
+    } else if (data.action === "match_success") {
+        alert("⚔️ 找到對手了！即將進入戰場...");
+        
+        // 收到成功訊號，自動淡出並跳轉到戰鬥房間
+        document.body.style.opacity = 0;
+        setTimeout(() => {
+            window.location.href = 'battle.html';
+        }, 500);
+    }
 };
 
 // 覆蓋原本的配對函數
 function startMatchmaking() {
     if (ws.readyState === WebSocket.OPEN) {
-        // 送出資料給 Python 伺服器
-        ws.send("請求進行玩家配對");
-        console.log("已送出配對請求。");
+        // 打包成 JSON 格式傳給伺服器
+        const request = { action: "match" };
+        ws.send(JSON.stringify(request));
     } else {
-        alert("伺服器未開啟，請確認 Python 腳本是否正在運行。");
+        alert("伺服器未連線，請確認 Python 是否運行中。");
     }
 }
-        }
 
         function createRoom() {
             alert("🏠 創建私人房間，請輸入房間密碼：");
