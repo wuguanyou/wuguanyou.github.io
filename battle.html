@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>星宿魔法師 - 星辰戰場 (動態卡牌版)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
+        
+        body {
+            background-image: url('image_49a786.jpg');
+            background-size: cover; background-position: center;
+            width: 100vw; height: 100vh; overflow: hidden;
+            font-family: 'Noto Serif TC', serif; color: #ffffff;
+            animation: fadeIn 0.8s ease forwards;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* --- 共用介面設定 --- */
+        .profile-area { position: absolute; display: flex; align-items: center; gap: 15px; z-index: 10; }
+        .avatar { width: 70px; height: 70px; border-radius: 50%; border: 2px solid #a0c0ff; background: rgba(10, 20, 40, 0.8); }
+        .info-box { display: flex; flex-direction: column; }
+        .name { font-size: 18px; font-weight: bold; letter-spacing: 2px; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
+        .level { font-size: 14px; color: #a0c0ff; }
+        
+        .hp-badge { 
+            background: radial-gradient(circle, #ff4d4d, #990000); border: 2px solid #ffd700;
+            width: 35px; height: 35px; border-radius: 50%; display: flex; justify-content: center; align-items: center;
+            font-weight: bold; font-size: 18px; box-shadow: 0 2px 5px rgba(0,0,0,0.5); position: absolute; left: 55px; top: 45px;
+        }
+
+        /* --- 頂部：敵方區 --- */
+        .enemy-profile { top: 20px; left: 30px; }
+        .enemy-resources { position: absolute; top: 30px; right: 30px; display: flex; gap: 20px; align-items: center; font-size: 18px; }
+        
+        /* 敵方手牌容器 (目前為空) */
+        .enemy-hand { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); display: flex; gap: 5px; }
+
+        /* --- 中央：戰鬥場地 --- */
+        .battlefield {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 80%; height: 50%; display: flex; flex-direction: column; justify-content: space-between; align-items: center; padding: 20px 0;
+        }
+        
+        /* 雙方場上角色容器 (目前為空) */
+        .field-row { display: flex; gap: 30px; align-items: center; justify-content: center; width: 100%; min-height: 160px; }
+
+        /* --- 底部：玩家區 --- */
+        .player-profile { bottom: 20px; left: 30px; }
+        
+        /* 玩家手牌容器 (用來動態塞入卡牌) */
+        .player-hand {
+            position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
+            display: flex; justify-content: center; align-items: flex-end; gap: -10px; z-index: 20;
+            height: 250px; width: 60%; /* 給予足夠的寬度容納動態卡牌 */
+        }
+
+        /* 動態生成的玩家手牌樣式 */
+        .hand-card {
+            width: 140px; height: 200px; background: linear-gradient(to bottom, rgba(30, 40, 80, 0.9), rgba(15, 20, 40, 0.95));
+            border: 1px solid #5bc0eb; border-radius: 10px; margin: 0 -15px; /* 模擬重疊 */
+            position: relative; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); cursor: pointer;
+            box-shadow: -5px 0 15px rgba(0,0,0,0.5); display: flex; flex-direction: column; align-items: center;
+            animation: slideUp 0.3s ease-out forwards; /* 抽卡時的浮現動畫 */
+        }
+        .hand-card:hover { transform: translateY(-30px) scale(1.1); z-index: 30; border-color: #ffd700; box-shadow: 0 0 20px rgba(100, 150, 255, 0.6); }
+
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .card-cost { position: absolute; top: 5px; left: 5px; background: rgba(0,0,0,0.6); border: 1px solid #ffd700; color: #ffd700; width: 25px; height: 25px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: bold; }
+        .card-title { margin-top: 15px; font-size: 14px; font-weight: bold; letter-spacing: 2px; }
+
+        /* --- 結束回合按鈕 --- */
+        .end-turn-btn {
+            position: absolute; right: 40px; top: 50%; transform: translateY(-50%);
+            width: 120px; height: 120px; border-radius: 50%;
+            background: radial-gradient(circle, rgba(30, 40, 80, 0.8) 0%, rgba(10, 15, 30, 0.9) 100%);
+            border: 2px solid #ffd700; box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            cursor: pointer; transition: all 0.2s; z-index: 10;
+        }
+        .end-turn-btn:hover { transform: translateY(-50%) scale(1.05); box-shadow: 0 0 30px rgba(255, 215, 0, 0.6); border-color: #fff; }
+        .end-text { font-size: 24px; font-weight: 900; letter-spacing: 4px; text-shadow: 0 0 10px #fff; }
+        .round-text { font-size: 12px; color: #a0c0ff; margin-top: 5px; }
+
+        /* 測試用按鈕：抽卡 */
+        .test-draw-btn {
+            position: absolute; bottom: 120px; left: 30px; padding: 10px 20px;
+            background: rgba(255, 215, 0, 0.8); border: none; border-radius: 5px;
+            font-weight: bold; cursor: pointer; z-index: 50; transition: 0.2s;
+        }
+        .test-draw-btn:hover { background: #fff; }
+
+    </style>
+</head>
+<body>
+
+    <!-- 頂部：對手資訊 -->
+    <div class="profile-area enemy-profile">
+        <div style="position: relative;">
+            <div class="avatar"></div>
+            <div class="hp-badge">21</div>
+        </div>
+        <div class="info-box">
+            <span class="name">星之觀測者</span>
+            <span class="level">Lv.30</span>
+        </div>
+    </div>
+    <div class="enemy-resources">
+        <span>✨ 8/10</span>
+        <span style="font-size: 24px; cursor: pointer;">⚙️</span>
+    </div>
+
+    <!-- 敵方手牌 (空容器) -->
+    <div class="enemy-hand" id="enemy-hand-container"></div>
+
+    <!-- 中央：戰鬥場地 -->
+    <div class="battlefield">
+        <!-- 敵方場上角色 (空容器) -->
+        <div class="field-row" id="enemy-field"></div>
+        <!-- 玩家場上角色 (空容器) -->
+        <div class="field-row" id="player-field"></div>
+    </div>
+
+    <!-- 底部：玩家資訊 -->
+    <div class="profile-area player-profile">
+        <div style="position: relative;">
+            <div class="avatar"></div>
+            <div class="hp-badge">20</div>
+        </div>
+        <div class="info-box">
+            <span class="name">星辰旅者</span>
+            <span class="level">Lv.30</span>
+            <span style="color:#ffd700; font-size:14px; margin-top:5px;">✨ 7/10</span>
+        </div>
+    </div>
+
+    <!-- 玩家手牌 (空容器，等待動態加入) -->
+    <div class="player-hand" id="player-hand-container"></div>
+
+    <!-- 結束回合按鈕 -->
+    <div class="end-turn-btn">
+        <span class="end-text">結束<br>回合</span>
+        <span class="round-text">第 8 回合</span>
+    </div>
+
+    <!-- 測試按鈕：模擬從牌組抽卡 -->
+    <button class="test-draw-btn" onclick="drawCard()">🃏 點我抽卡 (測試)</button>
+
+    <script>
+        // 卡牌資料庫 (模擬)
+        const cardDatabase = [
+            { name: "星隕術", cost: 2 },
+            { name: "星河護盾", cost: 1 },
+            { name: "星芒裁決", cost: 3 },
+            { name: "命運觀測", cost: 2 },
+            { name: "星體喚醒", cost: 4 }
+        ];
+
+        // 抽卡功能 (動態生成 HTML 元素)
+        function drawCard() {
+            const handContainer = document.getElementById('player-hand-container');
+            
+            // 限制手牌數量，避免無限抽
+            if (handContainer.children.length >= 10) {
+                alert("手牌已滿！");
+                return;
+            }
+
+            // 隨機抽一張卡
+            const randomCard = cardDatabase[Math.floor(Math.random() * cardDatabase.length)];
+
+            // 建立一個新的 <div> 元素作為卡牌
+            const newCardElement = document.createElement('div');
+            newCardElement.className = 'hand-card';
+            
+            // 設定卡牌內部的 HTML 結構
+            newCardElement.innerHTML = `
+                <div class="card-cost">${randomCard.cost}</div>
+                <div class="card-title">${randomCard.name}</div>
+            `;
+
+            // 綁定點擊事件 (出牌)
+            newCardElement.onclick = function() {
+                playCard(this, randomCard.name, randomCard.cost);
+            };
+
+            // 將這張卡牌塞入 HTML 的手牌容器中
+            handContainer.appendChild(newCardElement);
+        }
+
+        // 出牌功能 (動態移除 HTML 元素)
+        function playCard(cardElement, cardName, cost) {
+            // 加入往上飛並消失的動畫特效
+            cardElement.style.transform = 'translateY(-100px) scale(0)';
+            cardElement.style.opacity = '0';
+            cardElement.style.pointerEvents = 'none'; // 防止動畫過程中重複點擊
+            
+            // 等待動畫跑完 (0.3秒) 後，將元素從畫面中徹底刪除
+            setTimeout(() => {
+                cardElement.remove();
+                console.log(`已打出【${cardName}】，消耗法力 ${cost}`);
+            }, 300);
+        }
+    </script>
+</body>
+</html>
