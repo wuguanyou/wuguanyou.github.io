@@ -3,254 +3,246 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>星宿魔法師 - 星辰大廳</title>
+    <title>星宿魔法師 - 競技場大廳</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;900&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
         
         body {
-            /* 設定大廳背景圖 */
-            background-image: url('bg_lobby.png');
+            background-image: url('image_4b6a37.jpg');
             background-size: cover; background-position: center;
             width: 100vw; height: 100vh; overflow: hidden;
             font-family: 'Noto Serif TC', serif; color: #ffffff;
-            animation: fadeIn 0.8s ease forwards;
+            animation: fadeIn 0.5s ease forwards;
             transition: opacity 0.5s ease;
         }
 
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
         /* --- 頂部資訊列 --- */
-        header { position: absolute; top: 20px; left: 20px; right: 20px; display: flex; justify-content: space-between; z-index: 10; }
-        
-        .player-profile {
-            display: flex; align-items: center; gap: 15px; background: rgba(10, 15, 30, 0.6);
-            padding: 10px 20px 10px 10px; border-radius: 50px; border: 1px solid rgba(200, 180, 100, 0.3);
-            backdrop-filter: blur(5px); cursor: pointer; transition: transform 0.2s;
-        }
-        .player-profile:hover { transform: scale(1.05); border-color: rgba(255, 215, 0, 0.8); }
-        .avatar { width: 60px; height: 60px; border-radius: 50%; border: 2px solid #ffd700; background: #fff; display: flex; justify-content: center; align-items: center; color: #333; font-weight: bold; }
-        .player-level { font-size: 14px; color: #ffd700; font-weight: bold; }
-        .player-name { font-size: 18px; letter-spacing: 2px; }
+        header { position: absolute; top: 20px; left: 20px; right: 20px; display: flex; justify-content: space-between; align-items: flex-start; z-index: 10; }
+        .player-profile { display: flex; align-items: center; gap: 15px; cursor: pointer; transition: transform 0.2s; }
+        .player-profile:hover { transform: scale(1.05); }
+        .avatar { width: 60px; height: 60px; border-radius: 50%; border: 2px solid #a0c0ff; background: rgba(10, 20, 40, 0.8); display: flex; justify-content: center; align-items: center; }
+        .player-info { display: flex; flex-direction: column; }
+        .player-name { font-size: 18px; font-weight: bold; letter-spacing: 2px; text-shadow: 0 0 5px rgba(0,0,0,0.8); }
+        .player-id { font-size: 12px; color: #a0c0ff; letter-spacing: 1px; margin-top: 2px; }
 
         .top-right-menu { display: flex; gap: 20px; align-items: center; }
         .resource-item { display: flex; gap: 8px; background: rgba(10, 15, 30, 0.6); padding: 8px 15px; border-radius: 20px; font-size: 16px; border: 1px solid rgba(255, 255, 255, 0.2); }
         .sys-btn { background: rgba(10, 15, 30, 0.6); border: 1px solid rgba(255, 255, 255, 0.2); color: white; width: 45px; height: 45px; border-radius: 50%; font-size: 20px; cursor: pointer; transition: all 0.3s; }
-        .sys-btn:hover { background: rgba(255, 215, 0, 0.2); border-color: #ffd700; transform: rotate(15deg) scale(1.1); }
+        .sys-btn:hover { background: rgba(255, 215, 0, 0.2); border-color: #ffd700; transform: scale(1.1); }
 
-        /* --- 四大功能卡牌 --- */
-        .cards-container { position: absolute; bottom: 10%; right: 5%; display: flex; gap: 20px; z-index: 10; }
-        .action-card {
-            width: 180px; height: 380px; background: linear-gradient(to bottom, rgba(20, 30, 60, 0.4), rgba(10, 15, 30, 0.8));
-            border: 1px solid rgba(150, 180, 255, 0.3); border-radius: 10px; cursor: pointer; position: relative;
-            display: flex; flex-direction: column; justify-content: flex-end; align-items: center; padding-bottom: 30px;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); backdrop-filter: blur(2px);
+        /* --- 中央按鈕區 --- */
+        .center-menu {
+            position: absolute; top: 55%; left: 50%; transform: translate(-50%, -50%);
+            display: flex; flex-direction: column; gap: 20px; width: 450px;
         }
-        .action-card:hover { transform: translateY(-20px) scale(1.05); border-color: #ffd700; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 20px rgba(255, 215, 0, 0.4) inset; }
-        .card-icon { position: absolute; top: 20px; font-size: 30px; color: #ffd700; }
-        .card-title { font-size: 26px; font-weight: 900; letter-spacing: 4px; margin-bottom: 8px; text-shadow: 0 2px 5px rgba(0,0,0,0.8); }
-        .card-subtitle { font-size: 13px; color: #a0c0ff; letter-spacing: 2px; }
 
-        /* --- 返回按鈕 --- */
-        .back-home { position: absolute; bottom: 20px; left: 20px; background: transparent; color: rgba(255,255,255,0.5); border: none; cursor: pointer; font-size: 16px; z-index: 10; }
-        .back-home:hover { color: white; }
+        .arena-btn {
+            background: rgba(15, 25, 50, 0.6); border: 2px solid rgba(150, 180, 255, 0.4);
+            border-radius: 60px; padding: 15px 40px; display: flex; justify-content: space-between; align-items: center;
+            cursor: pointer; transition: all 0.3s ease; backdrop-filter: blur(4px);
+        }
+        .arena-btn:hover { border-color: #ffd700; box-shadow: 0 0 25px rgba(255, 215, 0, 0.4), inset 0 0 20px rgba(255, 215, 0, 0.2); transform: scale(1.05); }
 
-        /* ================= 玩家名片彈出視窗 (Modal) ================= */
+        .btn-text-box { text-align: center; flex-grow: 1; color: #fff; }
+        .btn-title { font-size: 24px; font-weight: 900; letter-spacing: 6px; margin-bottom: 2px; text-shadow: 0 0 10px rgba(255,255,255,0.5); }
+        .btn-subtitle { font-size: 10px; color: #a0c0ff; letter-spacing: 4px; }
+        .btn-side-icon { font-size: 24px; color: #ffd700; opacity: 0.8; }
+
+        /* 左上角返回按鈕 */
+        .back-nav { position: absolute; top: 100px; left: 30px; color: rgba(255,255,255,0.5); font-size: 14px; cursor: pointer; transition: 0.2s; }
+        .back-nav:hover { color: #fff; }
+
+        /* ================= 房間列表彈出視窗 (Modal) ================= */
         .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100vw; height: 100vh;
-            background: rgba(0, 0, 15, 0.7);
-            backdrop-filter: blur(8px);
-            display: none; /* 預設隱藏 */
-            justify-content: center;
-            align-items: center;
-            z-index: 100; /* 確保浮在最上層 */
-            opacity: 0;
-            transition: opacity 0.3s ease;
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0, 0, 15, 0.7); backdrop-filter: blur(8px);
+            display: none; justify-content: center; align-items: center;
+            z-index: 100; opacity: 0; transition: opacity 0.3s ease;
         }
 
-        .profile-card {
-            width: 600px;
+        .room-modal {
+            width: 500px; max-height: 80vh; display: flex; flex-direction: column;
             background: linear-gradient(135deg, rgba(20, 30, 60, 0.95), rgba(10, 15, 30, 0.95));
-            border: 2px solid #5bc0eb;
-            border-radius: 15px;
-            padding: 30px;
+            border: 2px solid #5bc0eb; border-radius: 15px; padding: 25px;
             box-shadow: 0 0 30px rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(100, 150, 255, 0.2);
-            position: relative;
-            transform: translateY(20px);
-            transition: transform 0.3s ease;
+            transform: translateY(20px); transition: transform 0.3s ease;
         }
 
-        /* 關閉按鈕 */
-        .close-btn {
-            position: absolute;
-            top: 15px; right: 20px;
-            background: transparent; border: none;
-            color: #a0c0ff; font-size: 24px; cursor: pointer;
-            transition: 0.2s;
-        }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(150, 180, 255, 0.3); padding-bottom: 15px; margin-bottom: 15px; }
+        .modal-header h2 { font-size: 22px; letter-spacing: 3px; color: #ffd700; }
+        .close-btn { background: transparent; border: none; color: #a0c0ff; font-size: 24px; cursor: pointer; transition: 0.2s; }
         .close-btn:hover { color: #fff; transform: scale(1.2); }
 
-        /* 名片上半部：大頭貼與名稱 */
-        .profile-header {
-            display: flex; align-items: center; gap: 25px;
-            border-bottom: 1px solid rgba(150, 180, 255, 0.3);
-            padding-bottom: 20px; margin-bottom: 20px;
+        .room-list { overflow-y: auto; flex-grow: 1; display: flex; flex-direction: column; gap: 10px; padding-right: 5px; }
+        
+        .room-item {
+            display: flex; justify-content: space-between; align-items: center;
+            background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.2);
+            padding: 15px 20px; border-radius: 8px; transition: 0.2s;
         }
-
-        .profile-avatar-large {
-            width: 100px; height: 100px;
-            border-radius: 50%; border: 3px solid #ffd700;
-            background: #fff; display: flex; justify-content: center; align-items: center;
-            color: #333; font-weight: bold; font-size: 20px;
-            box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+        .room-item:hover { border-color: #5bc0eb; background: rgba(91, 192, 235, 0.1); }
+        .room-name { font-size: 18px; font-weight: bold; letter-spacing: 2px; }
+        .room-status { font-size: 12px; color: #44cc44; }
+        
+        .join-btn {
+            background: rgba(255, 215, 0, 0.2); border: 1px solid #ffd700; color: #ffd700;
+            padding: 8px 20px; border-radius: 20px; cursor: pointer; font-weight: bold; transition: 0.2s;
         }
+        .join-btn:hover { background: #ffd700; color: #000; box-shadow: 0 0 10px #ffd700; }
 
-        .profile-details h2 { font-size: 28px; letter-spacing: 3px; margin-bottom: 5px; text-shadow: 0 2px 5px rgba(0,0,0,0.8); }
-        .profile-uid { color: #a0c0ff; font-size: 14px; letter-spacing: 1px; margin-bottom: 10px; }
+        .empty-msg { text-align: center; color: #a0c0ff; padding: 30px 0; font-size: 14px; letter-spacing: 2px; }
 
-        /* 經驗值條 */
-        .exp-container { width: 300px; }
-        .exp-text { display: flex; justify-content: space-between; font-size: 12px; color: #ffd700; margin-bottom: 5px; }
-        .exp-bar-bg { width: 100%; height: 8px; background: rgba(0,0,0,0.5); border-radius: 4px; overflow: hidden; border: 1px solid rgba(255,255,255,0.2); }
-        .exp-bar-fill { width: 75%; height: 100%; background: linear-gradient(to right, #ffd700, #ffaa00); }
-
-        /* 名片下半部：數據統計 */
-        .stats-grid {
-            display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; text-align: center;
-        }
-        .stat-box {
-            background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(150, 180, 255, 0.2);
-            border-radius: 8px; padding: 15px 10px;
-        }
-        .stat-value { font-size: 24px; font-weight: bold; color: #fff; margin-bottom: 5px; }
-        .stat-label { font-size: 12px; color: #a0c0ff; letter-spacing: 2px; }
+        /* 自訂卷軸 */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: #5bc0eb; border-radius: 10px; }
     </style>
 </head>
 <body>
-    
+
     <header>
-        <div class="player-profile" onclick="openProfile()">
+        <div class="player-profile">
             <div class="avatar">頭像</div>
-            <div style="display: flex; flex-direction: column;">
-                <span class="player-level">Lv.80</span>
-                <span class="player-name">星之觀測者</span>
+            <div class="player-info">
+                <span class="player-name">星之觀測者 ✦</span>
+                <span class="player-id">觀測者編號: 102938</span>
             </div>
         </div>
         <div class="top-right-menu">
             <div class="resource-item">🪙 128,450 +</div>
             <div class="resource-item">💎 8,920 +</div>
-            <button class="sys-btn" onclick="alert('開啟設定')">⚙️</button>
+            <button class="sys-btn">⚙️</button>
         </div>
     </header>
 
-    <div class="cards-container">
-        <div class="action-card" onclick="enterArena()">
-            <div class="card-icon">✧</div>
-            <div class="card-title">對戰配對</div>
-            <div class="card-subtitle">進入星辰競技場</div>
+    <div class="back-nav" onclick="goBack()">← 返回大廳</div>
+
+    <div class="center-menu">
+        <div class="arena-btn" onclick="startMatchmaking()">
+            <div class="btn-side-icon">✧</div>
+            <div class="btn-text-box"><div class="btn-title">玩家配對</div><div class="btn-subtitle">- QUICK MATCH -</div></div>
+            <div class="btn-side-icon">✧</div>
         </div>
-        <div class="action-card" onclick="alert('進入卡牌編輯')">
-            <div class="card-icon">◈</div>
-            <div class="card-title">卡牌編輯</div>
-            <div class="card-subtitle">組建專屬卡組</div>
+
+        <div class="arena-btn" onclick="createRoom()">
+            <div class="btn-side-icon">🚪</div>
+            <div class="btn-text-box"><div class="btn-title">創建房間</div><div class="btn-subtitle">- CREATE ROOM -</div></div>
+            <div class="btn-side-icon">🚪</div>
         </div>
-        <div class="action-card" onclick="alert('進入星宿召喚')">
-            <div class="card-icon">✦</div>
-            <div class="card-title">星宿召喚</div>
-            <div class="card-subtitle">召喚星辰使徒</div>
-        </div>
-        <div class="action-card" onclick="alert('開啟圖鑑')">
-            <div class="card-icon">❂</div>
-            <div class="card-title">圖鑑</div>
-            <div class="card-subtitle">查看收集圖鑑</div>
+
+        <div class="arena-btn" onclick="openRoomList()">
+            <div class="btn-side-icon">📜</div>
+            <div class="btn-text-box"><div class="btn-title">房間列表</div><div class="btn-subtitle">- ROOM LOBBY -</div></div>
+            <div class="btn-side-icon">📜</div>
         </div>
     </div>
 
-    <button class="back-home" onclick="goBack()">← 返回星盤</button>
-
-    <div class="modal-overlay" id="profileModal">
-        <div class="profile-card" id="profileCard">
-            <button class="close-btn" onclick="closeProfile()">✖</button>
-            
-            <div class="profile-header">
-                <div class="profile-avatar-large">頭像</div>
-                <div class="profile-details">
-                    <h2>星之觀測者</h2>
-                    <div class="profile-uid">UID: 1029384756</div>
-                    
-                    <div class="exp-container">
-                        <div class="exp-text">
-                            <span>Lv.80</span>
-                            <span>24,500 / 30,000 EXP</span>
-                        </div>
-                        <div class="exp-bar-bg">
-                            <div class="exp-bar-fill"></div>
-                        </div>
-                    </div>
-                </div>
+    <div class="modal-overlay" id="roomModal">
+        <div class="room-modal" id="roomCard">
+            <div class="modal-header">
+                <h2>可加入的房間</h2>
+                <button class="close-btn" onclick="closeRoomList()">✖</button>
             </div>
-
-            <div class="stats-grid">
-                <div class="stat-box">
-                    <div class="stat-value">128</div>
-                    <div class="stat-label">進行對局</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-value" style="color: #44cc44;">68%</div>
-                    <div class="stat-label">競技勝率</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-value" style="color: #ffd700;">42/50</div>
-                    <div class="stat-label">星宿收集</div>
-                </div>
+            
+            <div class="room-list" id="roomContainer">
+                <div class="empty-msg">連線中...</div>
             </div>
         </div>
     </div>
 
     <script>
-        // === 頁面跳轉邏輯 ===
-        
-        function enterArena() {
-            document.body.style.opacity = 0;
-            setTimeout(() => {
-                window.location.href = 'arena.html';
-            }, 500);
+        // === WebSocket 連線設定 ===
+        const ws = new WebSocket('ws://localhost:8765');
+
+        ws.onopen = () => { console.log('✅ 成功連接到星宿伺服器！'); };
+
+        ws.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            
+            // 更新房間列表 UI
+            if (data.action === "room_list_update") {
+                updateRoomListUI(data.rooms);
+            } 
+            else if (data.action === "waiting") {
+                alert("⏳ " + data.msg); 
+            } 
+            else if (data.action === "match_success") {
+                alert("⚔️ 成功配對！即將進入戰場...");
+                document.body.style.opacity = 0;
+                setTimeout(() => { window.location.href = 'battle.html'; }, 500);
+            } 
+            else if (data.action === "error") {
+                alert("⚠️ " + data.msg);
+            }
+        };
+
+        // === 更新房間列表介面 ===
+        function updateRoomListUI(rooms) {
+            const container = document.getElementById('roomContainer');
+            container.innerHTML = ''; // 清空目前的列表
+
+            if (rooms.length === 0) {
+                container.innerHTML = '<div class="empty-msg">目前沒有可加入的房間...<br>您可以自己創建一個！</div>';
+                return;
+            }
+
+            // 動態生成房間項目
+            rooms.forEach(roomName => {
+                const roomItem = document.createElement('div');
+                roomItem.className = 'room-item';
+                roomItem.innerHTML = `
+                    <div>
+                        <div class="room-name">${roomName}</div>
+                        <div class="room-status">等待加入 (1/2)</div>
+                    </div>
+                    <button class="join-btn" onclick="joinRoom('${roomName}')">加入</button>
+                `;
+                container.appendChild(roomItem);
+            });
         }
 
+        // === 遊戲互動邏輯 ===
         function goBack() {
             document.body.style.opacity = 0;
-            setTimeout(() => {
-                window.location.href = 'index.html';
-            }, 500);
+            setTimeout(() => { window.location.href = 'game.html'; }, 500);
         }
 
-        // === 玩家名片彈出視窗邏輯 ===
-
-        function openProfile() {
-            const modal = document.getElementById('profileModal');
-            const card = document.getElementById('profileCard');
-            
-            modal.style.display = 'flex'; // 先顯示容器
-            
-            // 使用一點延遲讓瀏覽器反應，以產生平滑淡入動畫
-            setTimeout(() => {
-                modal.style.opacity = '1';
-                card.style.transform = 'translateY(0)';
-            }, 10);
+        function startMatchmaking() {
+            if (ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ action: "match" }));
+            else alert("伺服器未連線。");
         }
 
-        function closeProfile() {
-            const modal = document.getElementById('profileModal');
-            const card = document.getElementById('profileCard');
-            
-            modal.style.opacity = '0';
-            card.style.transform = 'translateY(20px)';
-            
-            // 等待 0.3 秒的淡出動畫結束後，才真正隱藏元素
-            setTimeout(() => {
-                modal.style.display = 'none';
-            }, 300);
+        function createRoom() {
+            if (ws.readyState === WebSocket.OPEN) {
+                const pwd = prompt("為您的房間取個名稱或密碼：");
+                if (pwd && pwd.trim() !== "") {
+                    ws.send(JSON.stringify({ action: "create_room", password: pwd.trim() }));
+                }
+            } else alert("伺服器未連線。");
+        }
+
+        function joinRoom(roomName) {
+            if (ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({ action: "join_room", password: roomName }));
+            }
+        }
+
+        // === 視窗開關控制 ===
+        function openRoomList() {
+            const modal = document.getElementById('roomModal');
+            const card = document.getElementById('roomCard');
+            modal.style.display = 'flex';
+            setTimeout(() => { modal.style.opacity = '1'; card.style.transform = 'translateY(0)'; }, 10);
+        }
+
+        function closeRoomList() {
+            const modal = document.getElementById('roomModal');
+            const card = document.getElementById('roomCard');
+            modal.style.opacity = '0'; card.style.transform = 'translateY(20px)';
+            setTimeout(() => { modal.style.display = 'none'; }, 300);
         }
     </script>
 </body>
