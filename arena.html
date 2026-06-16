@@ -9,7 +9,7 @@
         * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
         
         body {
-            background-image: url('image_4b6a37.jpg');
+            background-image: url('bg_arena.png');
             background-size: cover; background-position: center;
             width: 100vw; height: 100vh; overflow: hidden;
             font-family: 'Noto Serif TC', serif; color: #ffffff;
@@ -19,21 +19,16 @@
 
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* --- 頂部資訊列 (Header) --- */
-        header {
-            position: absolute; top: 20px; left: 20px; right: 20px;
-            display: flex; justify-content: space-between; align-items: flex-start; z-index: 10;
-        }
-
-        .player-profile {
-            display: flex; align-items: center; gap: 15px;
-            cursor: pointer; transition: transform 0.2s;
-        }
+        /* --- 頂部資訊列 --- */
+        header { position: absolute; top: 20px; left: 20px; right: 20px; display: flex; justify-content: space-between; align-items: flex-start; z-index: 10; }
+        .player-profile { display: flex; align-items: center; gap: 15px; cursor: pointer; transition: transform 0.2s; }
         .player-profile:hover { transform: scale(1.05); }
         
-        .avatar {
-            width: 60px; height: 60px; border-radius: 50%; border: 2px solid #a0c0ff;
-            background: rgba(10, 20, 40, 0.8); display: flex; justify-content: center; align-items: center;
+        /* 頭像樣式更新為支援圖片 */
+        .avatar { 
+            width: 60px; height: 60px; border-radius: 50%; 
+            border: 2px solid #a0c0ff; background: rgba(10, 20, 40, 0.8); 
+            object-fit: cover;
         }
         
         .player-info { display: flex; flex-direction: column; }
@@ -45,61 +40,78 @@
         .sys-btn { background: rgba(10, 15, 30, 0.6); border: 1px solid rgba(255, 255, 255, 0.2); color: white; width: 45px; height: 45px; border-radius: 50%; font-size: 20px; cursor: pointer; transition: all 0.3s; }
         .sys-btn:hover { background: rgba(255, 215, 0, 0.2); border-color: #ffd700; transform: scale(1.1); }
 
-        /* --- 中央主要按鈕區 --- */
+        /* --- 中央按鈕區 --- */
         .center-menu {
-            position: absolute; top: 60%; left: 50%; transform: translate(-50%, -50%);
-            display: flex; flex-direction: column; gap: 30px; width: 450px;
+            position: absolute; top: 55%; left: 50%; transform: translate(-50%, -50%);
+            display: flex; flex-direction: column; gap: 15px; width: 450px;
         }
 
         .arena-btn {
-            background: rgba(15, 25, 50, 0.6);
-            border: 2px solid rgba(150, 180, 255, 0.4);
-            border-radius: 60px;
-            padding: 20px 40px;
-            display: flex; justify-content: space-between; align-items: center;
-            cursor: pointer; transition: all 0.3s ease;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(100, 150, 255, 0.2);
-            backdrop-filter: blur(4px);
+            background: rgba(15, 25, 50, 0.6); border: 2px solid rgba(150, 180, 255, 0.4);
+            border-radius: 60px; padding: 15px 40px; display: flex; justify-content: space-between; align-items: center;
+            cursor: pointer; transition: all 0.3s ease; backdrop-filter: blur(4px);
         }
-
-        .arena-btn:hover {
-            transform: scale(1.05);
-            border-color: #ffd700;
-            box-shadow: 0 0 25px rgba(255, 215, 0, 0.4), inset 0 0 20px rgba(255, 215, 0, 0.2);
-        }
+        .arena-btn:hover { border-color: #ffd700; box-shadow: 0 0 25px rgba(255, 215, 0, 0.4), inset 0 0 20px rgba(255, 215, 0, 0.2); transform: scale(1.05); }
 
         .btn-text-box { text-align: center; flex-grow: 1; color: #fff; }
-        .btn-title { font-size: 26px; font-weight: 900; letter-spacing: 6px; margin-bottom: 4px; text-shadow: 0 0 10px rgba(255,255,255,0.5); }
+        .btn-title { font-size: 22px; font-weight: 900; letter-spacing: 6px; margin-bottom: 2px; text-shadow: 0 0 10px rgba(255,255,255,0.5); }
         .btn-subtitle { font-size: 10px; color: #a0c0ff; letter-spacing: 4px; }
         .btn-side-icon { font-size: 24px; color: #ffd700; opacity: 0.8; }
 
-        /* --- 底部左右角落按鈕 --- */
-        .bottom-corner-btn {
-            position: absolute; bottom: 30px;
-            display: flex; flex-direction: column; align-items: center; gap: 8px;
-            cursor: pointer; transition: transform 0.2s; color: #a0c0ff;
-        }
-        .bottom-corner-btn:hover { transform: scale(1.1); color: #fff; }
-        .corner-icon { font-size: 28px; }
-        .corner-text { font-size: 14px; letter-spacing: 2px; }
-
-        .btn-left { left: 40px; }
-        .btn-right { right: 40px; }
-
         /* 左上角返回按鈕 */
-        .back-nav {
-            position: absolute; top: 100px; left: 30px;
-            color: rgba(255,255,255,0.5); font-size: 14px; cursor: pointer; transition: 0.2s;
-        }
+        .back-nav { position: absolute; top: 100px; left: 30px; color: rgba(255,255,255,0.5); font-size: 14px; cursor: pointer; transition: 0.2s; }
         .back-nav:hover { color: #fff; }
 
+        /* ================= 房間列表彈出視窗 ================= */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0, 0, 15, 0.7); backdrop-filter: blur(8px);
+            display: none; justify-content: center; align-items: center;
+            z-index: 100; opacity: 0; transition: opacity 0.3s ease;
+        }
+
+        .room-modal {
+            width: 500px; max-height: 80vh; display: flex; flex-direction: column;
+            background: linear-gradient(135deg, rgba(20, 30, 60, 0.95), rgba(10, 15, 30, 0.95));
+            border: 2px solid #5bc0eb; border-radius: 15px; padding: 25px;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(100, 150, 255, 0.2);
+            transform: translateY(20px); transition: transform 0.3s ease;
+        }
+
+        .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(150, 180, 255, 0.3); padding-bottom: 15px; margin-bottom: 15px; }
+        .modal-header h2 { font-size: 22px; letter-spacing: 3px; color: #ffd700; }
+        .close-btn { background: transparent; border: none; color: #a0c0ff; font-size: 24px; cursor: pointer; transition: 0.2s; }
+        .close-btn:hover { color: #fff; transform: scale(1.2); }
+
+        .room-list { overflow-y: auto; flex-grow: 1; display: flex; flex-direction: column; gap: 10px; padding-right: 5px; }
+        
+        .room-item {
+            display: flex; justify-content: space-between; align-items: center;
+            background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.2);
+            padding: 15px 20px; border-radius: 8px; transition: 0.2s;
+        }
+        .room-item:hover { border-color: #5bc0eb; background: rgba(91, 192, 235, 0.1); }
+        .room-name { font-size: 18px; font-weight: bold; letter-spacing: 2px; }
+        .room-status { font-size: 12px; color: #44cc44; }
+        
+        .join-btn {
+            background: rgba(255, 215, 0, 0.2); border: 1px solid #ffd700; color: #ffd700;
+            padding: 8px 20px; border-radius: 20px; cursor: pointer; font-weight: bold; transition: 0.2s;
+        }
+        .join-btn:hover { background: #ffd700; color: #000; box-shadow: 0 0 10px #ffd700; }
+
+        .empty-msg { text-align: center; color: #a0c0ff; padding: 30px 0; font-size: 14px; letter-spacing: 2px; }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: #5bc0eb; border-radius: 10px; }
     </style>
 </head>
 <body>
 
     <header>
         <div class="player-profile">
-            <div class="avatar">頭像</div>
+            <img src="avatars/avatar1.jpg" class="avatar" id="arena-avatar" alt="玩家頭像" onerror="this.src=''">
             <div class="player-info">
                 <span class="player-name">星之觀測者 ✦</span>
                 <span class="player-id">觀測者編號: 102938</span>
@@ -108,8 +120,6 @@
         <div class="top-right-menu">
             <div class="resource-item">🪙 128,450 +</div>
             <div class="resource-item">💎 8,920 +</div>
-            <button class="sys-btn">✉️</button>
-            <button class="sys-btn">🎁</button>
             <button class="sys-btn">⚙️</button>
         </div>
     </header>
@@ -119,88 +129,144 @@
     <div class="center-menu">
         <div class="arena-btn" onclick="startMatchmaking()">
             <div class="btn-side-icon">✧</div>
-            <div class="btn-text-box">
-                <div class="btn-title">玩家配對</div>
-                <div class="btn-subtitle">- QUICK MATCH -</div>
-            </div>
+            <div class="btn-text-box"><div class="btn-title">玩家配對</div><div class="btn-subtitle">- QUICK MATCH -</div></div>
             <div class="btn-side-icon">✧</div>
         </div>
 
         <div class="arena-btn" onclick="createRoom()">
             <div class="btn-side-icon">🚪</div>
-            <div class="btn-text-box">
-                <div class="btn-title">創建房間</div>
-                <div class="btn-subtitle">- CREATE ROOM -</div>
-            </div>
+            <div class="btn-text-box"><div class="btn-title">創建房間</div><div class="btn-subtitle">- CREATE ROOM -</div></div>
             <div class="btn-side-icon">🚪</div>
+        </div>
+
+        <div class="arena-btn" onclick="joinPrivateRoom()">
+            <div class="btn-side-icon">🔑</div>
+            <div class="btn-text-box"><div class="btn-title">加入房間</div><div class="btn-subtitle">- JOIN ROOM -</div></div>
+            <div class="btn-side-icon">🔑</div>
+        </div>
+
+        <div class="arena-btn" onclick="openRoomList()">
+            <div class="btn-side-icon">📜</div>
+            <div class="btn-text-box"><div class="btn-title">房間列表</div><div class="btn-subtitle">- ROOM LOBBY -</div></div>
+            <div class="btn-side-icon">📜</div>
         </div>
     </div>
 
-    <div class="bottom-corner-btn btn-left" onclick="alert('開啟對戰紀錄')">
-        <div class="corner-icon">📖</div>
-        <div class="corner-text">對戰紀錄</div>
-    </div>
-
-    <div class="bottom-corner-btn btn-right" onclick="alert('開啟卡牌商店')">
-        <div class="corner-icon">🛒</div>
-        <div class="corner-text">卡牌商店</div>
+    <div class="modal-overlay" id="roomModal">
+        <div class="room-modal" id="roomCard">
+            <div class="modal-header">
+                <h2>可加入的房間</h2>
+                <button class="close-btn" onclick="closeRoomList()">✖</button>
+            </div>
+            <div class="room-list" id="roomContainer">
+                <div class="empty-msg">連線中...</div>
+            </div>
+        </div>
     </div>
 
     <script>
+        // === 網頁載入時，讀取從 game.html 設定好的頭像 ===
+        window.onload = function() {
+            const savedAvatar = localStorage.getItem('playerAvatar');
+            if (savedAvatar) {
+                document.getElementById('arena-avatar').src = savedAvatar;
+            }
+        };
+
         // === WebSocket 連線設定 ===
         const ws = new WebSocket('ws://localhost:8765');
 
-        ws.onopen = () => { 
-            console.log('✅ 成功連接到星宿伺服器！'); 
-        };
+        ws.onopen = () => { console.log('✅ 成功連接到星宿伺服器！'); };
 
         ws.onmessage = (event) => {
             const data = JSON.parse(event.data);
             
-            if (data.action === "waiting") {
+            if (data.action === "room_list_update") {
+                updateRoomListUI(data.rooms);
+            } else if (data.action === "waiting") {
                 alert("⏳ " + data.msg); 
             } else if (data.action === "match_success") {
                 alert("⚔️ 成功配對！即將進入戰場...");
                 document.body.style.opacity = 0;
-                setTimeout(() => {
-                    window.location.href = 'battle.html';
-                }, 500);
+                setTimeout(() => { window.location.href = 'battle.html'; }, 500);
             } else if (data.action === "error") {
                 alert("⚠️ " + data.msg);
             }
         };
 
-        // === 遊戲按鈕邏輯 ===
+        function updateRoomListUI(rooms) {
+            const container = document.getElementById('roomContainer');
+            container.innerHTML = ''; 
+
+            if (rooms.length === 0) {
+                container.innerHTML = '<div class="empty-msg">目前沒有可加入的房間...<br>您可以自己創建一個！</div>';
+                return;
+            }
+
+            rooms.forEach(roomName => {
+                const roomItem = document.createElement('div');
+                roomItem.className = 'room-item';
+                roomItem.innerHTML = `
+                    <div>
+                        <div class="room-name">${roomName}</div>
+                        <div class="room-status">等待加入 (1/2)</div>
+                    </div>
+                    <button class="join-btn" onclick="joinRoom('${roomName}')">加入</button>
+                `;
+                container.appendChild(roomItem);
+            });
+        }
 
         function goBack() {
             document.body.style.opacity = 0;
-            setTimeout(() => {
-                window.location.href = 'game.html'; 
-            }, 500);
+            setTimeout(() => { window.location.href = 'game.html'; }, 500);
         }
 
         function startMatchmaking() {
-            if (ws.readyState === WebSocket.OPEN) {
-                ws.send(JSON.stringify({ action: "match" }));
-            } else {
-                alert("伺服器未連線。請確認 Python 是否運行中。");
-            }
+            if (ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ action: "match" }));
+            else alert("伺服器未連線。");
         }
 
         function createRoom() {
             if (ws.readyState === WebSocket.OPEN) {
-                const pwd = prompt("請輸入房間密碼 (若房間不存在將自動創建)：");
-                
+                const pwd = prompt("為您的房間取個名稱或密碼：");
                 if (pwd && pwd.trim() !== "") {
-                    const request = { 
-                        action: "private_match", 
-                        password: pwd.trim() 
-                    };
-                    ws.send(JSON.stringify(request));
+                    ws.send(JSON.stringify({ action: "create_room", password: pwd.trim() }));
+                }
+            } else alert("伺服器未連線。");
+        }
+
+        // 點擊列表的加入按鈕
+        function joinRoom(roomName) {
+            if (ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({ action: "join_room", password: roomName }));
+            }
+        }
+
+        // === 新增：手動輸入密碼加入私人房間 ===
+        function joinPrivateRoom() {
+            if (ws.readyState === WebSocket.OPEN) {
+                const pwd = prompt("請輸入朋友的房間名稱或密碼：");
+                if (pwd && pwd.trim() !== "") {
+                    ws.send(JSON.stringify({ action: "join_room", password: pwd.trim() }));
                 }
             } else {
-                alert("伺服器未連線。請確認 Python 是否運行中。");
+                alert("伺服器未連線。");
             }
+        }
+
+        function openRoomList() {
+            const modal = document.getElementById('roomModal');
+            const card = document.getElementById('roomCard');
+            modal.style.display = 'flex';
+            setTimeout(() => { modal.style.opacity = '1'; card.style.transform = 'translateY(0)'; }, 10);
+        }
+
+        function closeRoomList() {
+            const modal = document.getElementById('roomModal');
+            const card = document.getElementById('roomCard');
+            modal.style.opacity = '0'; card.style.transform = 'translateY(20px)';
+            setTimeout(() => { modal.style.display = 'none'; }, 300);
         }
     </script>
 </body>
