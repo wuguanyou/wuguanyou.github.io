@@ -9,7 +9,8 @@
         * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
         
         body {
-            background-image: url('bg_lobby.png');
+            /* 設定大廳背景圖 */
+            background-image: url('image_4daff7.jpg');
             background-size: cover; background-position: center;
             width: 100vw; height: 100vh; overflow: hidden;
             font-family: 'Noto Serif TC', serif; color: #ffffff;
@@ -57,7 +58,7 @@
 </head>
 <body>
     <header>
-        <div class="player-profile">
+        <div class="player-profile" onclick="alert('開啟玩家名片/成就介面')">
             <div class="avatar">頭像</div>
             <div style="display: flex; flex-direction: column;">
                 <span class="player-level">Lv.80</span>
@@ -67,12 +68,12 @@
         <div class="top-right-menu">
             <div class="resource-item">🪙 128,450 +</div>
             <div class="resource-item">💎 8,920 +</div>
-            <button class="sys-btn">⚙️</button>
+            <button class="sys-btn" onclick="alert('開啟設定')">⚙️</button>
         </div>
     </header>
 
     <div class="cards-container">
-        <div class="action-card" onclick="alert('進入對戰配對')">
+        <div class="action-card" onclick="enterArena()">
             <div class="card-icon">✧</div>
             <div class="card-title">對戰配對</div>
             <div class="card-subtitle">進入星辰競技場</div>
@@ -97,6 +98,15 @@
     <button class="back-home" onclick="goBack()">← 返回星盤</button>
 
     <script>
+        // 進入競技場大廳
+        function enterArena() {
+            document.body.style.opacity = 0;
+            setTimeout(() => {
+                window.location.href = 'arena.html';
+            }, 500);
+        }
+
+        // 返回起始畫面
         function goBack() {
             document.body.style.opacity = 0;
             setTimeout(() => {
