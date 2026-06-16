@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>星宿魔法師 - 競技場大廳</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
+        
+        body {
+            /* 設定競技場大廳背景圖 */
+            background-image: url('image_4b6a37.jpg');
+            background-size: cover; background-position: center;
+            width: 100vw; height: 100vh; overflow: hidden;
+            font-family: 'Noto Serif TC', serif; color: #ffffff;
+            animation: fadeIn 0.5s ease forwards;
+            transition: opacity 0.5s ease;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* --- 頂部資訊列 (Header) --- */
+        header {
+            position: absolute; top: 20px; left: 20px; right: 20px;
+            display: flex; justify-content: space-between; align-items: flex-start; z-index: 10;
+        }
+
+        .player-profile {
+            display: flex; align-items: center; gap: 15px;
+            cursor: pointer; transition: transform 0.2s;
+        }
+        .player-profile:hover { transform: scale(1.05); }
+        
+        .avatar {
+            width: 60px; height: 60px; border-radius: 50%; border: 2px solid #a0c0ff;
+            background: rgba(10, 20, 40, 0.8); display: flex; justify-content: center; align-items: center;
+        }
+        
+        .player-info { display: flex; flex-direction: column; }
+        .player-name { font-size: 18px; font-weight: bold; letter-spacing: 2px; text-shadow: 0 0 5px rgba(0,0,0,0.8); }
+        .player-id { font-size: 12px; color: #a0c0ff; letter-spacing: 1px; margin-top: 2px; }
+
+        .top-right-menu { display: flex; gap: 20px; align-items: center; }
+        .resource-item { display: flex; gap: 8px; background: rgba(10, 15, 30, 0.6); padding: 8px 15px; border-radius: 20px; font-size: 16px; border: 1px solid rgba(255, 255, 255, 0.2); }
+        .sys-btn { background: rgba(10, 15, 30, 0.6); border: 1px solid rgba(255, 255, 255, 0.2); color: white; width: 45px; height: 45px; border-radius: 50%; font-size: 20px; cursor: pointer; transition: all 0.3s; }
+        .sys-btn:hover { background: rgba(255, 215, 0, 0.2); border-color: #ffd700; transform: scale(1.1); }
+
+        /* --- 中央主要按鈕區 --- */
+        .center-menu {
+            position: absolute; top: 60%; left: 50%; transform: translate(-50%, -50%);
+            display: flex; flex-direction: column; gap: 30px; width: 450px;
+        }
+
+        .arena-btn {
+            background: rgba(15, 25, 50, 0.6);
+            border: 2px solid rgba(150, 180, 255, 0.4);
+            border-radius: 60px; /* 呈現橢圓形 */
+            padding: 20px 40px;
+            display: flex; justify-content: space-between; align-items: center;
+            cursor: pointer; transition: all 0.3s ease;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(100, 150, 255, 0.2);
+            backdrop-filter: blur(4px);
+        }
+
+        .arena-btn:hover {
+            transform: scale(1.05);
+            border-color: #ffd700;
+            box-shadow: 0 0 25px rgba(255, 215, 0, 0.4), inset 0 0 20px rgba(255, 215, 0, 0.2);
+        }
+
+        .btn-text-box { text-align: center; flex-grow: 1; color: #fff; }
+        .btn-title { font-size: 26px; font-weight: 900; letter-spacing: 6px; margin-bottom: 4px; text-shadow: 0 0 10px rgba(255,255,255,0.5); }
+        .btn-subtitle { font-size: 10px; color: #a0c0ff; letter-spacing: 4px; }
+        .btn-side-icon { font-size: 24px; color: #ffd700; opacity: 0.8; }
+
+        /* --- 底部左右角落按鈕 --- */
+        .bottom-corner-btn {
+            position: absolute; bottom: 30px;
+            display: flex; flex-direction: column; align-items: center; gap: 8px;
+            cursor: pointer; transition: transform 0.2s; color: #a0c0ff;
+        }
+        .bottom-corner-btn:hover { transform: scale(1.1); color: #fff; }
+        .corner-icon { font-size: 28px; }
+        .corner-text { font-size: 14px; letter-spacing: 2px; }
+
+        .btn-left { left: 40px; }
+        .btn-right { right: 40px; }
+
+        /* 左上角輔助返回按鈕 (為了方便網頁導航而加) */
+        .back-nav {
+            position: absolute; top: 100px; left: 30px;
+            color: rgba(255,255,255,0.5); font-size: 14px; cursor: pointer; transition: 0.2s;
+        }
+        .back-nav:hover { color: #fff; }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="player-profile">
+            <div class="avatar">頭像</div>
+            <div class="player-info">
+                <span class="player-name">星之觀測者 ✦</span>
+                <span class="player-id">觀測者編號: 102938</span>
+            </div>
+        </div>
+        <div class="top-right-menu">
+            <div class="resource-item">🪙 128,450 +</div>
+            <div class="resource-item">💎 8,920 +</div>
+            <button class="sys-btn">✉️</button>
+            <button class="sys-btn">🎁</button>
+            <button class="sys-btn">⚙️</button>
+        </div>
+    </header>
+
+    <div class="back-nav" onclick="goBack()">← 返回大廳</div>
+
+    <div class="center-menu">
+        <div class="arena-btn" onclick="startMatchmaking()">
+            <div class="btn-side-icon">✧</div>
+            <div class="btn-text-box">
+                <div class="btn-title">玩家配對</div>
+                <div class="btn-subtitle">- QUICK MATCH -</div>
+            </div>
+            <div class="btn-side-icon">✧</div>
+        </div>
+
+        <div class="arena-btn" onclick="createRoom()">
+            <div class="btn-side-icon">🚪</div>
+            <div class="btn-text-box">
+                <div class="btn-title">創建房間</div>
+                <div class="btn-subtitle">- CREATE ROOM -</div>
+            </div>
+            <div class="btn-side-icon">🚪</div>
+        </div>
+    </div>
+
+    <div class="bottom-corner-btn btn-left" onclick="alert('開啟對戰紀錄')">
+        <div class="corner-icon">📖</div>
+        <div class="corner-text">對戰紀錄</div>
+    </div>
+
+    <div class="bottom-corner-btn btn-right" onclick="alert('開啟卡牌商店')">
+        <div class="corner-icon">🛒</div>
+        <div class="corner-text">卡牌商店</div>
+    </div>
+
+    <script>
+        function goBack() {
+            document.body.style.opacity = 0;
+            setTimeout(() => {
+                window.location.href = 'game.html'; // 返回主大廳
+            }, 500);
+        }
+
+        function startMatchmaking() {
+            alert("🔍 尋找對手中...\n(這裡之後可以串接 Python WebSocket 或 Socket.io 進行真實連線配對)");
+        }
+
+        function createRoom() {
+            alert("🏠 創建私人房間，請輸入房間密碼：");
+        }
+    </script>
+</body>
+</html>
