@@ -3,272 +3,299 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>星宿魔法師 - 星辰對決</title>
+    <title>星宿魔法師 - 競技場大廳</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;900&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
         
         body {
-            /* 設定戰鬥戰場背景圖 */
-            background-image: url('image_bg_battle.png');
+            /* 設定競技場大廳背景圖 */
+            background-image: url('image_4b6a37.jpg');
             background-size: cover; background-position: center;
             width: 100vw; height: 100vh; overflow: hidden;
             font-family: 'Noto Serif TC', serif; color: #ffffff;
-            display: flex; flex-direction: column; justify-content: space-between;
-            padding: 30px;
-            animation: fadeIn 0.8s ease forwards;
+            animation: fadeIn 0.5s ease forwards;
+            transition: opacity 0.5s ease;
         }
 
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* ================= 雙人資訊列 (HUD) ================= */
-        .player-hud {
-            display: flex; align-items: center; gap: 20px;
-            background: linear-gradient(to right, rgba(10, 15, 30, 0.8), rgba(20, 30, 60, 0.4));
-            padding: 15px 30px; border-radius: 15px; width: 450px;
-            border-left: 5px solid #ffd700; border-top: 1px solid rgba(255,255,255,0.1);
-            backdrop-filter: blur(5px); transition: transform 0.2s;
+        /* --- 頂部資訊列 --- */
+        header { position: absolute; top: 20px; left: 20px; right: 20px; display: flex; justify-content: space-between; align-items: flex-start; z-index: 10; }
+        
+        .player-profile { display: flex; align-items: center; gap: 15px; cursor: pointer; transition: transform 0.2s; }
+        .player-profile:hover { transform: scale(1.05); }
+        
+        /* 支援動態同步的圓形頭像 */
+        .avatar { 
+            width: 60px; height: 60px; border-radius: 50%; 
+            border: 2px solid #ffd700; background: rgba(10, 20, 40, 0.8); 
+            object-fit: cover; box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
         }
         
-        /* 對手在上方、玩家在下方 */
-        .hud-enemy { align-self: flex-start; border-left-color: #ff4444; }
-        .hud-self { align-self: flex-end; border-left-color: #00ccff; }
+        .player-info { display: flex; flex-direction: column; }
+        .player-level { font-size: 14px; color: #ffd700; font-weight: bold; }
+        .player-name { font-size: 18px; font-weight: bold; letter-spacing: 2px; text-shadow: 0 0 5px rgba(0,0,0,0.8); }
 
-        .battle-avatar {
-            width: 70px; height: 70px; border-radius: 50%;
-            border: 2px solid #fff; object-fit: cover;
-            box-shadow: 0 0 15px rgba(255,255,255,0.2);
+        .top-right-menu { display: flex; gap: 20px; align-items: center; }
+        .resource-item { display: flex; gap: 8px; background: rgba(10, 15, 30, 0.6); padding: 8px 15px; border-radius: 20px; font-size: 16px; border: 1px solid rgba(255, 255, 255, 0.2); }
+        .sys-btn { background: rgba(10, 15, 30, 0.6); border: 1px solid rgba(255, 255, 255, 0.2); color: white; width: 45px; height: 45px; border-radius: 50%; font-size: 20px; cursor: pointer; transition: all 0.3s; }
+        .sys-btn:hover { background: rgba(255, 215, 0, 0.2); border-color: #ffd700; transform: scale(1.1); }
+
+        /* --- 左上角返回大廳導覽 --- */
+        .back-nav { position: absolute; top: 100px; left: 30px; color: rgba(255,255,255,0.5); font-size: 14px; cursor: pointer; transition: 0.2s; z-index: 10; }
+        .back-nav:hover { color: #fff; }
+
+        /* --- 中央核心按鈕區 (四大戰鬥選項) --- */
+        .center-menu {
+            position: absolute; top: 55%; left: 50%; transform: translate(-50%, -50%);
+            display: flex; flex-direction: column; gap: 15px; width: 450px;
         }
-        .hud-enemy .battle-avatar { border-color: #ff4444; box-shadow: 0 0 15px rgba(255, 68, 68, 0.4); }
-        .hud-self .battle-avatar { border-color: #00ccff; box-shadow: 0 0 15px rgba(0, 204, 255, 0.4); }
 
-        .status-bars { flex-grow: 1; display: flex; flex-direction: column; gap: 8px; }
-        .name-tag { font-size: 18px; font-weight: bold; letter-spacing: 2px; text-shadow: 0 2px 4px #000; }
+        .arena-btn {
+            background: rgba(15, 25, 50, 0.6); border: 2px solid rgba(150, 180, 255, 0.4);
+            border-radius: 60px; padding: 15px 40px; display: flex; justify-content: space-between; align-items: center;
+            cursor: pointer; transition: all 0.3s ease; backdrop-filter: blur(4px);
+        }
+        .arena-btn:hover { border-color: #ffd700; box-shadow: 0 0 25px rgba(255, 215, 0, 0.4), inset 0 0 20px rgba(255, 215, 0, 0.2); transform: scale(1.05); }
+
+        .btn-text-box { text-align: center; flex-grow: 1; color: #fff; }
+        .btn-title { font-size: 22px; font-weight: 900; letter-spacing: 6px; margin-bottom: 2px; text-shadow: 0 0 10px rgba(255,255,255,0.5); }
+        .btn-subtitle { font-size: 10px; color: #a0c0ff; letter-spacing: 4px; }
+        .btn-side-icon { font-size: 24px; color: #ffd700; opacity: 0.8; }
+
+        /* ================= 房間列表彈出視窗 (Modal) ================= */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0, 0, 15, 0.7); backdrop-filter: blur(8px);
+            display: none; justify-content: center; align-items: center;
+            z-index: 100; opacity: 0; transition: opacity 0.3s ease;
+        }
+
+        .room-modal {
+            width: 500px; max-height: 80vh; display: flex; flex-direction: column;
+            background: linear-gradient(135deg, rgba(20, 30, 60, 0.95), rgba(10, 15, 30, 0.95));
+            border: 2px solid #5bc0eb; border-radius: 15px; padding: 25px;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(100, 150, 255, 0.2);
+            transform: translateY(20px); transition: transform 0.3s ease;
+        }
+
+        .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(150, 180, 255, 0.3); padding-bottom: 15px; margin-bottom: 15px; }
+        .modal-header h2 { font-size: 22px; letter-spacing: 3px; color: #ffd700; }
+        .close-btn { background: transparent; border: none; color: #a0c0ff; font-size: 24px; cursor: pointer; transition: 0.2s; }
+        .close-btn:hover { color: #fff; transform: scale(1.2); }
+
+        .room-list { overflow-y: auto; flex-grow: 1; display: flex; flex-direction: column; gap: 10px; padding-right: 5px; }
         
-        /* 核心計量條外框 */
-        .bar-container { position: relative; width: 100%; height: 16px; background: rgba(0,0,0,0.6); border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); overflow: hidden; }
-        .bar-text { position: absolute; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; font-size: 11px; font-weight: bold; font-family: monospace; z-index: 2; text-shadow: 0 1px 2px #000; }
+        .room-item {
+            display: flex; justify-content: space-between; align-items: center;
+            background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.2);
+            padding: 15px 20px; border-radius: 8px; transition: 0.2s;
+        }
+        .room-item:hover { border-color: #5bc0eb; background: rgba(91, 192, 235, 0.1); }
+        .room-name { font-size: 18px; font-weight: bold; letter-spacing: 2px; }
+        .room-status { font-size: 12px; color: #44cc44; }
         
-        /* 血條動態填滿區 */
-        .hp-fill { 
-            height: 100%; width: 100%; 
-            background: linear-gradient(to right, #ff4444, #ffaa00);
-            transition: width 0.4s cubic-bezier(0.075, 0.82, 0.165, 1); /* 平滑扣血精髓 */
+        .join-btn {
+            background: rgba(255, 215, 0, 0.2); border: 1px solid #ffd700; color: #ffd700;
+            padding: 8px 20px; border-radius: 20px; cursor: pointer; font-weight: bold; transition: 0.2s;
         }
-        .hud-self .hp-fill { background: linear-gradient(to right, #00ccff, #00ffaa); }
+        .join-btn:hover { background: #ffd700; color: #000; box-shadow: 0 0 10px #ffd700; }
 
-        /* 魔力條動態填滿區 */
-        .mp-fill { height: 100%; width: 100%; background: linear-gradient(to right, #9933ff, #e066ff); transition: width 0.3s ease; }
+        .empty-msg { text-align: center; color: #a0c0ff; padding: 30px 0; font-size: 14px; letter-spacing: 2px; }
 
-        /* 被攻擊時的外框震動動畫特效 */
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            20%, 60% { transform: translateX(-8px); }
-            40%, 80% { transform: translateX(8px); }
-        }
-        .damaged-shake { animation: shake 0.3s ease-in-out; }
-
-        /* ================= 中央戰場與日誌 ================= */
-        .center-battlefield {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 600px; height: 300px; display: flex; flex-direction: column; justify-content: center; align-items: center;
-        }
-
-        .action-log {
-            width: 100%; background: rgba(5, 10, 20, 0.7); border: 1px solid rgba(150, 180, 255, 0.2);
-            border-radius: 10px; padding: 15px; height: 120px; overflow-y: auto;
-            font-size: 14px; line-height: 1.6; color: #a0c0ff; backdrop-filter: blur(3px);
-        }
-        .log-entry { margin-bottom: 5px; animation: logFade 0.3s ease; }
-        @keyframes logFade { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* ================= 右側：快捷測試面板 ================= */
-        .test-panel {
-            position: absolute; right: 30px; top: 50%; transform: translateY(-50%);
-            background: rgba(15, 20, 35, 0.9); border: 2px solid #ffd700; border-radius: 12px;
-            padding: 20px; display: flex; flex-direction: column; gap: 12px; width: 220px;
-            box-shadow: 0 0 20px rgba(0,0,0,0.8); z-index: 20;
-        }
-        .test-title { font-size: 14px; color: #ffd700; text-align: center; font-weight: bold; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 8px; }
-        .test-btn {
-            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.3); color: #fff;
-            padding: 10px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold; transition: 0.2s;
-        }
-        .test-btn.dmg-enemy { border-color: #ff4444; color: #ff8888; }
-        .test-btn.dmg-enemy:hover { background: rgba(255,68,68,0.2); transform: scale(1.05); }
-        .test-btn.dmg-self { border-color: #00ccff; color: #88e5ff; }
-        .test-btn.dmg-self:hover { background: rgba(0,204,255,0.2); transform: scale(1.05); }
-        .test-btn.heal { border-color: #44cc44; color: #88ff88; }
-        .test-btn.heal:hover { background: rgba(68,204,68,0.2); transform: scale(1.05); }
-
-        /* 逃跑退場按鈕 */
-        .escape-btn { background: transparent; border: none; color: rgba(255,255,255,0.4); font-size: 14px; cursor: pointer; text-decoration: underline; margin-top: 10px; text-align: center; }
-        .escape-btn:hover { color: #ff4444; }
+        /* 自訂美化滾動條 */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: #5bc0eb; border-radius: 10px; }
     </style>
 </head>
 <body>
 
-    <!-- 1. 上方區塊：對手資訊 HUD -->
-    <div class="player-hud hud-enemy" id="hud-enemy">
-        <img src="avatars/avatar3.png" class="battle-avatar" alt="對手頭像" onerror="this.src='avatars/avatar3.png'">
-        <div class="status-bars">
-            <div class="name-tag">暗影使徒 ❖</div>
-            <!-- 對手血條 -->
-            <div class="bar-container">
-                <div class="bar-text" id="enemy-hp-text">HP: 100 / 100</div>
-                <div class="hp-fill" id="enemy-hp-bar" style="width: 100%;"></div>
+    <!-- 頂部資訊列 -->
+    <header>
+        <div class="player-profile" onclick="goBack()">
+            <!-- 自動抓取 localStorage 中的最新頭像 -->
+            <img src="avatars/avatar1.png" class="avatar" id="arena-avatar" alt="玩家頭像" onerror="this.src='avatars/avatar1.png'">
+            <div class="player-info">
+                <span class="player-level">Lv.80</span>
+                <!-- 自動抓取 localStorage 中的最新玩家暱稱 -->
+                <span class="player-name" id="arena-username">星之觀測者</span>
             </div>
-            <!-- 對手魔力條 -->
-            <div class="bar-container" style="height: 10px;">
-                <div class="mp-fill" id="enemy-mp-bar" style="width: 100%;"></div>
-            </div>
+        </div>
+        <!-- 自動同步修改後的金幣與鑽石 -->
+        <div class="top-right-menu">
+            <div class="resource-item">🪙 <span id="arena-coins">128,450</span></div>
+            <div class="resource-item">💎 <span id="arena-diamonds">8,920</span></div>
+            <button class="sys-btn">⚙️</button>
+        </div>
+    </header>
+
+    <!-- 左上角返回按鈕 -->
+    <div class="back-nav" onclick="goBack()">← 返回大廳</div>
+
+    <!-- 中央核心按鈕區 -->
+    <div class="center-menu">
+        <!-- 1. 快速配對 -->
+        <div class="arena-btn" onclick="startMatchmaking()">
+            <div class="btn-side-icon">✧</div>
+            <div class="btn-text-box"><div class="btn-title">玩家配對</div><div class="btn-subtitle">- QUICK MATCH -</div></div>
+            <div class="btn-side-icon">✧</div>
+        </div>
+
+        <!-- 2. 創建私人房間 -->
+        <div class="arena-btn" onclick="createRoom()">
+            <div class="btn-side-icon">🚪</div>
+            <div class="btn-text-box"><div class="btn-title">創建房間</div><div class="btn-subtitle">- CREATE ROOM -</div></div>
+            <div class="btn-side-icon">🚪</div>
+        </div>
+
+        <!-- 3. 輸入指定房號/密碼加入 -->
+        <div class="arena-btn" onclick="joinPrivateRoom()">
+            <div class="btn-side-icon">🔑</div>
+            <div class="btn-text-box"><div class="btn-title">加入房間</div><div class="btn-subtitle">- JOIN ROOM -</div></div>
+            <div class="btn-side-icon">🔑</div>
+        </div>
+
+        <!-- 4. 點開看當前有哪些開放房間 -->
+        <div class="arena-btn" onclick="openRoomList()">
+            <div class="btn-side-icon">📜</div>
+            <div class="btn-text-box"><div class="btn-title">房間列表</div><div class="btn-subtitle">- ROOM LOBBY -</div></div>
+            <div class="btn-side-icon">📜</div>
         </div>
     </div>
 
-    <!-- 2. 中央區塊：戰場日誌監控 -->
-    <div class="center-battlefield">
-        <div class="action-log" id="combatLog">
-            <div class="log-entry" style="color: #ffd700;">★ 星辰結界已展開，對決正式開始！</div>
-        </div>
-    </div>
-
-    <!-- 3. 下方區塊：玩家自身資訊 HUD -->
-    <div class="player-hud hud-self" id="hud-self">
-        <!-- 會自動讀取大廳頭像 -->
-        <img src="avatars/avatar1.png" class="battle-avatar" id="battle-self-avatar" alt="我的頭像" onerror="this.src='avatars/avatar1.png'">
-        <div class="status-bars">
-            <!-- 會自動讀取大廳暱稱 -->
-            <div class="name-tag" id="battle-self-name">星之觀測者</div>
-            <!-- 玩家自身血條 -->
-            <div class="bar-container">
-                <div class="bar-text" id="self-hp-text">HP: 100 / 100</div>
-                <div class="hp-fill" id="self-hp-bar" style="width: 100%;"></div>
+    <!-- 房間列表彈出視窗 -->
+    <div class="modal-overlay" id="roomModal">
+        <div class="room-modal" id="roomCard">
+            <div class="modal-header">
+                <h2>可加入的房間</h2>
+                <button class="close-btn" onclick="closeRoomList()">✖</button>
             </div>
-            <!-- 玩家自身魔力條 -->
-            <div class="bar-container" style="height: 10px;">
-                <div class="mp-fill" id="self-mp-bar" style="width: 100%;"></div>
+            <div class="room-list" id="roomContainer">
+                <div class="empty-msg">連線中...</div>
             </div>
         </div>
-    </div>
-
-    <!-- 4. 右側工具：超酷手動調血量測試面板 -->
-    <div class="test-panel">
-        <div class="test-title">🧙‍♂️ 戰場觀測調校面板</div>
-        <button class="test-btn dmg-enemy" onclick="executeAction('enemy_damage', 20)">🔥 轟炸對手 (-20 HP)</button>
-        <button class="test-btn dmg-self" onclick="executeAction('self-damage', 15)">⚡ 對手打我 (-15 HP)</button>
-        <button class="test-btn heal" onclick="executeAction('heal_all', 25)">✨ 聖光集體治療 (+25)</button>
-        <button class="test-btn" onclick="executeAction('use_mp', 30)">🔮 消耗我的魔力 (-30)</button>
-        <button class="escape-btn" onclick="escapeBattle()">🏳️ 認輸撤離戰場</button>
     </div>
 
     <script>
-        // === 戰場核心血量與魔力變數 ===
-        let selfHP = 100;
-        let selfMP = 100;
-        let enemyHP = 100;
-        let enemyMP = 100;
-
-        // === 初始化：自動載入大廳設定好的形象與暱稱 ===
+        // === 網頁載入時，從 localStorage 讀取動態資料以串聯系統 ===
         window.onload = function() {
+            // 1. 同步頭像路徑
             const savedAvatar = localStorage.getItem('playerAvatar');
             if (savedAvatar) {
-                document.getElementById('battle-self-avatar').src = savedAvatar;
+                document.getElementById('arena-avatar').src = savedAvatar;
             }
+            
+            // 2. 同步使用者名稱
             const savedName = localStorage.getItem('playerName');
             if (savedName) {
-                document.getElementById('battle-self-name').innerText = savedName;
+                document.getElementById('arena-username').innerText = savedName;
+            }
+
+            // 3. 同步金幣與鑽石
+            document.getElementById('arena-coins').innerText = localStorage.getItem('playerCoins') || "128,450";
+            document.getElementById('arena-diamonds').innerText = localStorage.getItem('playerDiamonds') || "8,920";
+        };
+
+        // === WebSocket 真實連線通道設定 ===
+        const ws = new WebSocket('ws://localhost:8765');
+
+        ws.onopen = () => { console.log('✅ 成功連接到星宿伺服器！'); };
+
+        ws.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            
+            if (data.action === "room_list_update") {
+                updateRoomListUI(data.rooms);
+            } else if (data.action === "waiting") {
+                alert("⏳ " + data.msg); 
+            } else if (data.action === "match_success") {
+                alert("⚔️ 成功配對！即將進入戰場...");
+                document.body.style.opacity = 0;
+                // 準確跳轉到對決戰場頁面
+                setTimeout(() => { window.location.href = 'battle.html'; }, 500);
+            } else if (data.action === "error") {
+                alert("⚠️ " + data.msg);
             }
         };
 
-        // === 動態更動血量與魔力的核心函數 ===
-        function executeAction(actionType, amount) {
-            const logBox = document.getElementById('combatLog');
-            let logText = "";
+        // === 動態渲染房間清單彈窗 UI ===
+        function updateRoomListUI(rooms) {
+            const container = document.getElementById('roomContainer');
+            container.innerHTML = ''; 
 
-            if (actionType === 'enemy_damage') {
-                // 扣除對手血量，最低限制為 0
-                enemyHP = Math.max(0, enemyHP - amount);
-                logText = `⚔️ 你吟唱了星辰裂變，對【暗影使徒】造成了 ${amount} 點暴擊傷害！`;
-                
-                // 觸發對手 HUD 畫面震動受擊特效
-                triggerShake('hud-enemy');
-            } 
-            else if (actionType === 'self-damage') {
-                // 扣除自身血量
-                selfHP = Math.max(0, selfHP - amount);
-                logText = `💥 敵方發動了暗影侵蝕，你受到了 ${amount} 點痛擊！`;
-                
-                // 觸發自身 HUD 畫面震動受擊特效
-                triggerShake('hud-self');
-            } 
-            else if (actionType === 'heal_all') {
-                // 集體回血，最高限制為 100
-                selfHP = Math.min(100, selfHP + amount);
-                enemyHP = Math.min(100, enemyHP + amount);
-                selfMP = Math.min(100, selfMP + amount);
-                enemyMP = Math.min(100, enemyMP + amount);
-                logText = `✨ 戰場降下璀璨極光，所有人恢復了 ${amount} 點生命與魔力！`;
-            }
-            else if (actionType === 'use_mp') {
-                selfMP = Math.max(0, selfMP - amount);
-                logText = `🔮 你消耗了 ${amount} 點魔力引導高階星宿法陣。`;
+            if (rooms.length === 0) {
+                container.innerHTML = '<div class="empty-msg">目前沒有可加入的房間...<br>您可以自己創建一個！</div>';
+                return;
             }
 
-            // === 驅動前端 UI 畫面更新填滿寬度與文字 ===
-            // 自身數據渲染
-            document.getElementById('self-hp-bar').style.width = selfHP + '%';
-            document.getElementById('self-hp-text').innerText = `HP: ${selfHP} / 100`;
-            document.getElementById('self-mp-bar').style.width = selfMP + '%';
-
-            // 對手數據渲染
-            document.getElementById('enemy-hp-bar').style.width = enemyHP + '%';
-            document.getElementById('enemy-hp-text').innerText = `HP: ${enemyHP} / 100`;
-            document.getElementById('enemy-mp-bar').style.width = enemyMP + '%';
-
-            // 寫入戰鬥日誌
-            const newLog = document.createElement('div');
-            newLog.className = 'log-entry';
-            newLog.innerText = logText;
-            logBox.appendChild(newLog);
-            logBox.scrollTop = logBox.scrollHeight; // 自動捲動到最下面
-
-            // 勝負評判檢測
-            checkBattleOver();
+            rooms.forEach(roomName => {
+                const roomItem = document.createElement('div');
+                roomItem.className = 'room-item';
+                roomItem.innerHTML = `
+                    <div>
+                        <div class="room-name">${roomName}</div>
+                        <div class="room-status">等待加入 (1/2)</div>
+                    </div>
+                    <button class="join-btn" onclick="joinRoom('${roomName}')">加入</button>
+                `;
+                container.appendChild(roomItem);
+            });
         }
 
-        // === 畫面受擊震動小特效 ===
-        function triggerShake(elementId) {
-            const el = document.getElementById(elementId);
-            el.classList.add('damaged-shake');
-            // 動態完畢後立刻把 class 拔掉，下一次才能重複觸發
-            setTimeout(() => { el.classList.remove('damaged-shake'); }, 300);
-        }
-
-        // === 檢測生死勝負 ===
-        function checkBattleOver() {
-            if (selfHP <= 0) {
-                alert("💀 你的生命歸零，敗給了暗影力量... 即將返回競技大廳。");
-                escapeBattle();
-            } else if (enemyHP <= 0) {
-                alert("🏆 勝利！你成功的封印了對手！即將衣錦還鄉返回大廳。");
-                escapeBattle();
-            }
-        }
-
-        // === 認輸/退出戰場 ===
-        function escapeBattle() {
+        // === 競技場核心互動邏輯 ===
+        
+        function goBack() {
             document.body.style.opacity = 0;
-            setTimeout(() => {
-                window.location.href = 'arena.html';
-            }, 500);
+            setTimeout(() => { window.location.href = 'game.html'; }, 500);
         }
 
-        // === 預留：未來的 WebSocket 真實連線通道 ===
-        // const ws = new WebSocket('ws://localhost:8765');
-        // ws.onmessage = (event) => { 
-        //     const data = JSON.parse(event.data);
-        //     // 未來對手出牌扣血，只要在這裡接收並呼叫 executeAction() 即可！
-        // };
+        function startMatchmaking() {
+            if (ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ action: "match" }));
+            else alert("伺服器未連線。請確認後端 Python server.py 是否正常啟動中！");
+        }
+
+        function createRoom() {
+            if (ws.readyState === WebSocket.OPEN) {
+                const pwd = prompt("為您的專屬房間命名或設定連線密碼：");
+                if (pwd && pwd.trim() !== "") {
+                    ws.send(JSON.stringify({ action: "create_room", password: pwd.trim() }));
+                }
+            } else alert("伺服器未連線。");
+        }
+
+        function joinRoom(roomName) {
+            if (ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({ action: "join_room", password: roomName }));
+            }
+        }
+
+        function joinPrivateRoom() {
+            if (ws.readyState === WebSocket.OPEN) {
+                const pwd = prompt("請輸入朋友創建的房間名稱或密碼：");
+                if (pwd && pwd.trim() !== "") {
+                    ws.send(JSON.stringify({ action: "join_room", password: pwd.trim() }));
+                }
+            } else {
+                alert("伺服器未連線。");
+            }
+        }
+
+        // === 彈窗視窗開關控制動畫 ===
+        function openRoomList() {
+            const modal = document.getElementById('roomModal');
+            const card = document.getElementById('roomCard');
+            modal.style.display = 'flex';
+            setTimeout(() => { modal.style.opacity = '1'; card.style.transform = 'translateY(0)'; }, 10);
+        }
+
+        function closeRoomList() {
+            const modal = document.getElementById('roomModal');
+            const card = document.getElementById('roomCard');
+            modal.style.opacity = '0'; card.style.transform = 'translateY(20px)';
+            setTimeout(() => { modal.style.display = 'none'; }, 300);
+        }
     </script>
 </body>
 </html>
