@@ -38,8 +38,15 @@
         .player-level { font-size: 14px; color: #ffd700; font-weight: bold; }
         .player-name { font-size: 18px; letter-spacing: 2px; }
 
+        /* 右上角資產項目（加入點擊手勢與 Hover 特效） */
         .top-right-menu { display: flex; gap: 20px; align-items: center; }
-        .resource-item { display: flex; gap: 8px; background: rgba(10, 15, 30, 0.6); padding: 8px 15px; border-radius: 20px; font-size: 16px; border: 1px solid rgba(255, 255, 255, 0.2); }
+        .resource-item { 
+            display: flex; gap: 8px; background: rgba(10, 15, 30, 0.6); 
+            padding: 8px 15px; border-radius: 20px; font-size: 16px; 
+            border: 1px solid rgba(255, 255, 255, 0.2); cursor: pointer; transition: all 0.2s;
+        }
+        .resource-item:hover { border-color: #ffd700; background: rgba(255, 215, 0, 0.1); transform: scale(1.05); }
+
         .sys-btn { background: rgba(10, 15, 30, 0.6); border: 1px solid rgba(255, 255, 255, 0.2); color: white; width: 45px; height: 45px; border-radius: 50%; font-size: 20px; cursor: pointer; transition: all 0.3s; }
         .sys-btn:hover { background: rgba(255, 215, 0, 0.2); border-color: #ffd700; transform: rotate(15deg) scale(1.1); }
 
@@ -79,38 +86,15 @@
 
         .profile-header { display: flex; align-items: center; gap: 25px; border-bottom: 1px solid rgba(150, 180, 255, 0.3); padding-bottom: 20px; margin-bottom: 20px; }
         
-        .profile-avatar-wrapper {
-            position: relative;
-            width: 100px; height: 100px;
-            cursor: pointer;
-        }
-        
-        .profile-avatar-large {
-            width: 100%; height: 100%; border-radius: 50%; border: 3px solid #ffd700; background: #fff; 
-            object-fit: cover; box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
-            transition: filter 0.2s;
-        }
-
-        .profile-avatar-wrapper::after {
-            content: "修改形象";
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 10, 0.6); border-radius: 50%;
-            display: flex; justify-content: center; align-items: center;
-            color: #ffd700; font-size: 12px; font-weight: bold; letter-spacing: 1px;
-            opacity: 0; transition: opacity 0.2s;
-            border: 3px solid #5bc0eb; box-shadow: 0 0 15px #5bc0eb;
-        }
+        .profile-avatar-wrapper { position: relative; width: 100px; height: 100px; cursor: pointer; }
+        .profile-avatar-large { width: 100%; height: 100%; border-radius: 50%; border: 3px solid #ffd700; background: #fff; object-fit: cover; box-shadow: 0 0 15px rgba(255, 215, 0, 0.5); transition: filter 0.2s; }
+        .profile-avatar-wrapper::after { content: "修改形象"; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 10, 0.6); border-radius: 50%; display: flex; justify-content: center; align-items: center; color: #ffd700; font-size: 12px; font-weight: bold; letter-spacing: 1px; opacity: 0; transition: opacity 0.2s; border: 3px solid #5bc0eb; box-shadow: 0 0 15px #5bc0eb; }
         .profile-avatar-wrapper:hover::after { opacity: 1; }
         .profile-avatar-wrapper:hover .profile-avatar-large { filter: blur(1px); }
 
-        /* 新增：名字與編輯按鈕的排版 */
         .username-container { display: flex; align-items: center; gap: 10px; margin-bottom: 5px; }
         .profile-details h2 { font-size: 28px; letter-spacing: 3px; text-shadow: 0 2px 5px rgba(0,0,0,0.8); }
-        
-        .edit-name-btn {
-            background: transparent; border: none; color: #a0c0ff; font-size: 18px; 
-            cursor: pointer; transition: all 0.2s; opacity: 0.6;
-        }
+        .edit-name-btn { background: transparent; border: none; color: #a0c0ff; font-size: 18px; cursor: pointer; transition: all 0.2s; opacity: 0.6; }
         .edit-name-btn:hover { color: #ffd700; opacity: 1; transform: scale(1.2); }
 
         .profile-uid { color: #a0c0ff; font-size: 14px; letter-spacing: 1px; margin-bottom: 10px; }
@@ -120,37 +104,28 @@
         .exp-bar-bg { width: 100%; height: 8px; background: rgba(0,0,0,0.5); border-radius: 4px; overflow: hidden; border: 1px solid rgba(255,255,255,0.2); }
         .exp-bar-fill { width: 75%; height: 100%; background: linear-gradient(to right, #ffd700, #ffaa00); }
 
+        /* 數據統計格子（加入點擊與動態反饋樣式） */
         .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; text-align: center; margin-bottom: 0px; }
-        .stat-box { background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(150, 180, 255, 0.2); border-radius: 8px; padding: 15px 10px; }
+        .stat-box { 
+            background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(150, 180, 255, 0.2); 
+            border-radius: 8px; padding: 15px 10px; cursor: pointer; transition: all 0.2s;
+        }
+        .stat-box:hover { border-color: #ffd700; background: rgba(255, 215, 0, 0.05); transform: translateY(-3px); }
         .stat-value { font-size: 24px; font-weight: bold; color: #fff; margin-bottom: 5px; }
         .stat-label { font-size: 12px; color: #a0c0ff; letter-spacing: 2px; }
 
-        .avatar-selection-area {
-            background: rgba(0, 0, 0, 0.5); border-radius: 10px; padding: 15px;
-            border: 1px dashed rgba(150, 180, 255, 0.4); margin-top: 25px;
-            display: none; 
-            animation: slideDown 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-        }
-        
-        @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-15px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
+        .avatar-selection-area { background: rgba(0, 0, 0, 0.5); border-radius: 10px; padding: 15px; border: 1px dashed rgba(150, 180, 255, 0.4); margin-top: 25px; display: none; animation: slideDown 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-15px); } to { opacity: 1; transform: translateY(0); } }
         .avatar-selection-title { font-size: 14px; color: #ffd700; margin-bottom: 12px; letter-spacing: 2px; text-align: center; font-weight: bold; }
         .avatar-list { display: flex; gap: 20px; justify-content: center; padding-bottom: 5px; }
-        
-        .avatar-option {
-            width: 65px; height: 65px; border-radius: 50%; object-fit: cover;
-            border: 2px solid transparent; cursor: pointer; transition: all 0.2s;
-            opacity: 0.5;
-        }
+        .avatar-option { width: 65px; height: 65px; border-radius: 50%; object-fit: cover; border: 2px solid transparent; cursor: pointer; transition: all 0.2s; opacity: 0.5; }
         .avatar-option:hover { opacity: 1; transform: scale(1.1); border-color: #5bc0eb; }
         .avatar-option.selected { border-color: #ffd700; opacity: 1; box-shadow: 0 0 15px rgba(255,215,0,0.6); transform: scale(1.05); }
     </style>
 </head>
 <body>
     
+    <!-- 頂部資訊列 -->
     <header>
         <div class="player-profile" onclick="openProfile()">
             <img src="avatars/avatar1.png" class="avatar" id="main-avatar" alt="玩家頭像" onerror="this.src=''">
@@ -159,13 +134,15 @@
                 <span class="player-name" id="main-username">星之觀測者</span>
             </div>
         </div>
+        <!-- 動態綁定金幣與鑽石點擊事件 -->
         <div class="top-right-menu">
-            <div class="resource-item">🪙 128,450 +</div>
-            <div class="resource-item">💎 8,920 +</div>
+            <div class="resource-item" onclick="editData('coins')" title="修改金幣數量">🪙 <span id="res-coins">128,450</span> +</div>
+            <div class="resource-item" onclick="editData('diamonds')" title="修改鑽石數量">💎 <span id="res-diamonds">8,920</span> +</div>
             <button class="sys-btn">⚙️</button>
         </div>
     </header>
 
+    <!-- 四大功能卡牌區 -->
     <div class="cards-container">
         <div class="action-card" onclick="enterArena()">
             <div class="card-icon">✧</div><div class="card-title">對戰配對</div><div class="card-subtitle">進入星辰競技場</div>
@@ -183,6 +160,7 @@
 
     <button class="back-home" onclick="goBack()">← 返回星盤</button>
 
+    <!-- 玩家名片彈出視窗 -->
     <div class="modal-overlay" id="profileModal">
         <div class="profile-card" id="profileCard">
             <button class="close-btn" onclick="closeProfile()">✖</button>
@@ -204,12 +182,23 @@
                 </div>
             </div>
 
+            <!-- 動態綁定生涯數據點擊事件 -->
             <div class="stats-grid">
-                <div class="stat-box"><div class="stat-value">128</div><div class="stat-label">進行對局</div></div>
-                <div class="stat-box"><div class="stat-value" style="color: #44cc44;">68%</div><div class="stat-label">競技勝率</div></div>
-                <div class="stat-box"><div class="stat-value" style="color: #ffd700;">42/50</div><div class="stat-label">星宿收集</div></div>
+                <div class="stat-box" onclick="editData('matches')" title="修改對局場次">
+                    <div class="stat-value" id="stat-matches">128</div>
+                    <div class="stat-label">進行對局 ✏️</div>
+                </div>
+                <div class="stat-box" onclick="editData('winrate')" title="修改對戰勝率">
+                    <div class="stat-value" id="stat-winrate" style="color: #44cc44;">68%</div>
+                    <div class="stat-label">競技勝率 ✏️</div>
+                </div>
+                <div class="stat-box" onclick="editData('collection')" title="修改星宿收集度">
+                    <div class="stat-value" id="stat-collection" style="color: #ffd700;">42/50</div>
+                    <div class="stat-label">星宿收集 ✏️</div>
+                </div>
             </div>
 
+            <!-- 頭像選擇庫 -->
             <div class="avatar-selection-area" id="avatarSelector">
                 <div class="avatar-selection-title">✦ 選擇觀測者新形象 ✦</div>
                 <div class="avatar-list">
@@ -222,42 +211,68 @@
     </div>
 
     <script>
-        // === 初始化：載入記憶的頭像與使用者名稱 ===
+        // === 初始化：網頁載入時從 localStorage 讀取所有動態資料 ===
         window.onload = function() {
-            // 讀取頭像
+            // 1. 讀取形象與暱稱
             const savedAvatar = localStorage.getItem('playerAvatar');
             if (savedAvatar) {
                 document.getElementById('main-avatar').src = savedAvatar;
                 document.getElementById('modal-avatar').src = savedAvatar;
-                
                 document.querySelectorAll('.avatar-option').forEach(img => {
                     if (img.getAttribute('src') === savedAvatar) img.classList.add('selected');
                     else img.classList.remove('selected');
                 });
             }
-
-            // 讀取使用者名稱
             const savedName = localStorage.getItem('playerName');
             if (savedName) {
                 document.getElementById('main-username').innerText = savedName;
                 document.getElementById('modal-username').innerText = savedName;
             }
+
+            // 2. 讀取核心數據（如果沒有儲存過，就給予預設值）
+            document.getElementById('res-coins').innerText = localStorage.getItem('playerCoins') || "128,450";
+            document.getElementById('res-diamonds').innerText = localStorage.getItem('playerDiamonds') || "8,920";
+            document.getElementById('stat-matches').innerText = localStorage.getItem('playerMatches') || "128";
+            document.getElementById('stat-winrate').innerText = localStorage.getItem('playerWinRate') || "68%";
+            document.getElementById('stat-collection').innerText = localStorage.getItem('playerCollection') || "42/50";
         };
+
+        // === 核心數據修改總函數 ===
+        function editData(type) {
+            let elementId, storageKey, promptMsg;
+
+            // 根據點擊的不同區塊，分配對應的網頁 ID、儲存 Key 與提示字
+            switch(type) {
+                case 'coins':
+                    elementId = 'res-coins'; storageKey = 'playerCoins'; promptMsg = '請輸入新的金幣數量：'; break;
+                case 'diamonds':
+                    elementId = 'res-diamonds'; storageKey = 'playerDiamonds'; promptMsg = '請輸入新的鑽石數量：'; break;
+                case 'matches':
+                    elementId = 'stat-matches'; storageKey = 'playerMatches'; promptMsg = '請輸入新的進行總對局數：'; break;
+                case 'winrate':
+                    elementId = 'stat-winrate'; storageKey = 'playerWinRate'; promptMsg = '請輸入新的勝率 (例如 75%)：'; break;
+                case 'collection':
+                    elementId = 'stat-collection'; storageKey = 'playerCollection'; promptMsg = '請輸入新的收集數量 (例如 45/50)：'; break;
+            }
+
+            const currentVal = document.getElementById(elementId).innerText;
+            const newVal = prompt(promptMsg, currentVal);
+
+            if (newVal && newVal.trim() !== "") {
+                const cleanVal = newVal.trim();
+                document.getElementById(elementId).innerText = cleanVal; // 更新介面
+                localStorage.setItem(storageKey, cleanVal); // 永久儲存
+            }
+        }
 
         // === 修改使用者名稱邏輯 ===
         function editUsername() {
             const currentName = document.getElementById('modal-username').innerText;
             const newName = prompt("請輸入新的使用者名稱（最多 12 個字）：", currentName);
-            
-            // 檢查使用者是否有輸入，且不全是空白
             if (newName && newName.trim() !== "") {
-                const cleanName = newName.trim().substring(0, 12); // 限制最多 12 個字
-                
-                // 1. 更新畫面上的文字
+                const cleanName = newName.trim().substring(0, 12);
                 document.getElementById('main-username').innerText = cleanName;
                 document.getElementById('modal-username').innerText = cleanName;
-                
-                // 2. 永久儲存至 localStorage
                 localStorage.setItem('playerName', cleanName);
             }
         }
@@ -265,23 +280,16 @@
         // === 控制頭像選擇庫的展開/收合 ===
         function toggleAvatarSelection() {
             const selector = document.getElementById('avatarSelector');
-            if (selector.style.display === 'block') {
-                selector.style.display = 'none';
-            } else {
-                selector.style.display = 'block';
-            }
+            selector.style.display = (selector.style.display === 'block') ? 'none' : 'block';
         }
 
         // === 更換頭像邏輯 ===
         function changeAvatar(imagePath, element) {
             document.getElementById('main-avatar').src = imagePath;
             document.getElementById('modal-avatar').src = imagePath;
-            
             localStorage.setItem('playerAvatar', imagePath);
-
             document.querySelectorAll('.avatar-option').forEach(img => img.classList.remove('selected'));
             element.classList.add('selected');
-            
             setTimeout(() => { toggleAvatarSelection(); }, 200);
         }
 
@@ -290,7 +298,6 @@
             document.body.style.opacity = 0;
             setTimeout(() => { window.location.href = 'arena.html'; }, 500);
         }
-
         function goBack() {
             document.body.style.opacity = 0;
             setTimeout(() => { window.location.href = 'index.html'; }, 500);
@@ -303,20 +310,14 @@
             modal.style.display = 'flex'; 
             setTimeout(() => { modal.style.opacity = '1'; card.style.transform = 'translateY(0)'; }, 10);
         }
-
         function closeProfile() {
             const modal = document.getElementById('profileModal');
             const card = document.getElementById('profileCard');
             const selector = document.getElementById('avatarSelector');
-            
-            modal.style.opacity = '0';
-            card.style.transform = 'translateY(20px)';
-            
-            setTimeout(() => {
-                modal.style.display = 'none';
-                selector.style.display = 'none'; 
-            }, 300);
+            modal.style.opacity = '0'; card.style.transform = 'translateY(20px)';
+            setTimeout(() => { modal.style.display = 'none'; selector.style.display = 'none'; }, 300);
         }
     </script>
 </body>
+</html>
 </html>
