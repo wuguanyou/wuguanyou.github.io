@@ -3,100 +3,101 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>星宿魔法師 - 觀測中</title>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600&display=swap" rel="stylesheet">
+    <title>星宿魔法師 - 星辰大廳</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;900&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            user-select: none;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
+        
         body {
-            /* 這裡準備放你第二張場景圖片 */
-            background-color: #1a1a2e; /* 圖片還沒放之前的備用底色 */
-            /* background-image: url('bg_lobby.png'); */
-            background-size: cover;
-            background-position: center;
-            width: 100vw;
-            height: 100vh;
-            overflow: hidden;
-            font-family: 'Noto Serif TC', serif;
-            color: #fff;
-            
-            /* 淡入特效 */
+            background-image: url('bg_lobby.png');
+            background-size: cover; background-position: center;
+            width: 100vw; height: 100vh; overflow: hidden;
+            font-family: 'Noto Serif TC', serif; color: #ffffff;
             animation: fadeIn 0.8s ease forwards;
+            transition: opacity 0.5s ease;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* 左上角返回按鈕 */
-        .back-btn {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            background: rgba(0, 0, 0, 0.5);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            color: white;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-family: 'Noto Serif TC', serif;
-            transition: all 0.3s;
+        /* 頂部資訊列 */
+        header { position: absolute; top: 20px; left: 20px; right: 20px; display: flex; justify-content: space-between; z-index: 10; }
+        
+        .player-profile {
+            display: flex; align-items: center; gap: 15px; background: rgba(10, 15, 30, 0.6);
+            padding: 10px 20px 10px 10px; border-radius: 50px; border: 1px solid rgba(200, 180, 100, 0.3);
+            backdrop-filter: blur(5px); cursor: pointer; transition: transform 0.2s;
         }
+        .player-profile:hover { transform: scale(1.05); border-color: rgba(255, 215, 0, 0.8); }
+        .avatar { width: 60px; height: 60px; border-radius: 50%; border: 2px solid #ffd700; background: #fff; display: flex; justify-content: center; align-items: center; color: #333; font-weight: bold; }
+        .player-level { font-size: 14px; color: #ffd700; font-weight: bold; }
+        .player-name { font-size: 18px; letter-spacing: 2px; }
 
-        .back-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
-            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-        }
+        .top-right-menu { display: flex; gap: 20px; align-items: center; }
+        .resource-item { display: flex; gap: 8px; background: rgba(10, 15, 30, 0.6); padding: 8px 15px; border-radius: 20px; font-size: 16px; border: 1px solid rgba(255, 255, 255, 0.2); }
+        .sys-btn { background: rgba(10, 15, 30, 0.6); border: 1px solid rgba(255, 255, 255, 0.2); color: white; width: 45px; height: 45px; border-radius: 50%; font-size: 20px; cursor: pointer; transition: all 0.3s; }
+        .sys-btn:hover { background: rgba(255, 215, 0, 0.2); border-color: #ffd700; transform: rotate(15deg) scale(1.1); }
 
-        /* 遊戲主要互動區塊 (對話框風格) */
-        .game-panel {
-            position: absolute;
-            bottom: 5%;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 80%;
-            height: 25%;
-            background: linear-gradient(135deg, rgba(15, 20, 40, 0.85) 0%, rgba(30, 40, 70, 0.85) 100%);
-            border: 2px solid rgba(100, 150, 255, 0.4);
-            border-radius: 10px;
-            padding: 30px;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        /* 四大功能卡牌 */
+        .cards-container { position: absolute; bottom: 10%; right: 5%; display: flex; gap: 20px; z-index: 10; }
+        .action-card {
+            width: 180px; height: 380px; background: linear-gradient(to bottom, rgba(20, 30, 60, 0.4), rgba(10, 15, 30, 0.8));
+            border: 1px solid rgba(150, 180, 255, 0.3); border-radius: 10px; cursor: pointer; position: relative;
+            display: flex; flex-direction: column; justify-content: flex-end; align-items: center; padding-bottom: 30px;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); backdrop-filter: blur(2px);
         }
+        .action-card:hover { transform: translateY(-20px) scale(1.05); border-color: #ffd700; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 20px rgba(255, 215, 0, 0.4) inset; }
+        .card-icon { position: absolute; top: 20px; font-size: 30px; color: #ffd700; }
+        .card-title { font-size: 26px; font-weight: 900; letter-spacing: 4px; margin-bottom: 8px; text-shadow: 0 2px 5px rgba(0,0,0,0.8); }
+        .card-subtitle { font-size: 13px; color: #a0c0ff; letter-spacing: 2px; }
 
-        .character-name {
-            font-size: 24px;
-            color: #ffd700;
-            margin-bottom: 15px;
-            letter-spacing: 2px;
-        }
-
-        .dialogue-text {
-            font-size: 18px;
-            line-height: 1.6;
-            letter-spacing: 1px;
-        }
+        /* 返回按鈕 */
+        .back-home { position: absolute; bottom: 20px; left: 20px; background: transparent; color: rgba(255,255,255,0.5); border: none; cursor: pointer; font-size: 16px; }
+        .back-home:hover { color: white; }
     </style>
 </head>
 <body>
+    <header>
+        <div class="player-profile">
+            <div class="avatar">頭像</div>
+            <div style="display: flex; flex-direction: column;">
+                <span class="player-level">Lv.80</span>
+                <span class="player-name">星之觀測者</span>
+            </div>
+        </div>
+        <div class="top-right-menu">
+            <div class="resource-item">🪙 128,450 +</div>
+            <div class="resource-item">💎 8,920 +</div>
+            <button class="sys-btn">⚙️</button>
+        </div>
+    </header>
 
-    <button class="back-btn" onclick="goBack()">← 返回星盤</button>
-
-    <div class="game-panel">
-        <div class="character-name">星宿導師</div>
-        <div class="dialogue-text" id="text-box">
-            「觀測者，你來了。星辰的軌跡已經發生偏轉，我們必須盡快查明原因...」
+    <div class="cards-container">
+        <div class="action-card" onclick="alert('進入對戰配對')">
+            <div class="card-icon">✧</div>
+            <div class="card-title">對戰配對</div>
+            <div class="card-subtitle">進入星辰競技場</div>
+        </div>
+        <div class="action-card" onclick="alert('進入卡牌編輯')">
+            <div class="card-icon">◈</div>
+            <div class="card-title">卡牌編輯</div>
+            <div class="card-subtitle">組建專屬卡組</div>
+        </div>
+        <div class="action-card" onclick="alert('進入星宿召喚')">
+            <div class="card-icon">✦</div>
+            <div class="card-title">星宿召喚</div>
+            <div class="card-subtitle">召喚星辰使徒</div>
+        </div>
+        <div class="action-card" onclick="alert('開啟圖鑑')">
+            <div class="card-icon">❂</div>
+            <div class="card-title">圖鑑</div>
+            <div class="card-subtitle">查看收集圖鑑</div>
         </div>
     </div>
 
+    <button class="back-home" onclick="goBack()">← 返回星盤</button>
+
     <script>
         function goBack() {
-            document.body.style.transition = "opacity 0.5s ease";
             document.body.style.opacity = 0;
             setTimeout(() => {
                 window.location.href = 'index.html';
