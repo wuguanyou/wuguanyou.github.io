@@ -9,7 +9,7 @@
         * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
         
         body {
-            background-image: url('bg_lobby.png');
+            background-image: url('image_4daff7.jpg');
             background-size: cover; background-position: center;
             width: 100vw; height: 100vh; overflow: hidden;
             font-family: 'Noto Serif TC', serif; color: #ffffff;
@@ -79,7 +79,6 @@
 
         .profile-header { display: flex; align-items: center; gap: 25px; border-bottom: 1px solid rgba(150, 180, 255, 0.3); padding-bottom: 20px; margin-bottom: 20px; }
         
-        /* 新增：名片大頭貼的外框容器與 Hover 編輯特效 */
         .profile-avatar-wrapper {
             position: relative;
             width: 100px; height: 100px;
@@ -92,7 +91,6 @@
             transition: filter 0.2s;
         }
 
-        /* 移上去時顯示發光的「編輯」字樣 */
         .profile-avatar-wrapper::after {
             content: "修改形象";
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
@@ -118,11 +116,10 @@
         .stat-value { font-size: 24px; font-weight: bold; color: #fff; margin-bottom: 5px; }
         .stat-label { font-size: 12px; color: #a0c0ff; letter-spacing: 2px; }
 
-        /* --- 修正：更換頭像區域改為預設隱藏，帶有彈出動畫 --- */
         .avatar-selection-area {
             background: rgba(0, 0, 0, 0.5); border-radius: 10px; padding: 15px;
             border: 1px dashed rgba(150, 180, 255, 0.4); margin-top: 25px;
-            display: none; /* 預設隱藏，點擊頭像後觸發 */
+            display: none; 
             animation: slideDown 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
         }
         
@@ -147,7 +144,7 @@
     
     <header>
         <div class="player-profile" onclick="openProfile()">
-            <img src="avatars/avatar1.jpg" class="avatar" id="main-avatar" alt="玩家頭像" onerror="this.src=''">
+            <img src="avatars/avatar1.png" class="avatar" id="main-avatar" alt="玩家頭像" onerror="this.src=''">
             <div style="display: flex; flex-direction: column;">
                 <span class="player-level">Lv.80</span>
                 <span class="player-name">星之觀測者</span>
@@ -183,7 +180,7 @@
             
             <div class="profile-header">
                 <div class="profile-avatar-wrapper" onclick="toggleAvatarSelection()">
-                    <img src="avatars/avatar1.jpg" class="profile-avatar-large" id="modal-avatar" alt="玩家頭像" onerror="this.src=''">
+                    <img src="avatars/avatar1.png" class="profile-avatar-large" id="modal-avatar" alt="玩家頭像" onerror="this.src=''">
                 </div>
                 <div class="profile-details">
                     <h2>星之觀測者</h2>
@@ -204,9 +201,9 @@
             <div class="avatar-selection-area" id="avatarSelector">
                 <div class="avatar-selection-title">✦ 選擇觀測者新形象 ✦</div>
                 <div class="avatar-list">
-                    <img src="avatars/avatar1.jpg" class="avatar-option selected" onclick="changeAvatar('avatars/avatar1.jpg', this)">
-                    <img src="avatars/avatar2.jpg" class="avatar-option" onclick="changeAvatar('avatars/avatar2.jpg', this)">
-                    <img src="avatars/avatar3.jpg" class="avatar-option" onclick="changeAvatar('avatars/avatar3.jpg', this)">
+                    <img src="avatars/avatar1.png" class="avatar-option selected" onclick="changeAvatar('avatars/avatar1.png', this)">
+                    <img src="avatars/avatar2.png" class="avatar-option" onclick="changeAvatar('avatars/avatar2.png', this)">
+                    <img src="avatars/avatar3.png" class="avatar-option" onclick="changeAvatar('avatars/avatar3.png', this)">
                 </div>
             </div>
         </div>
@@ -247,7 +244,6 @@
             document.querySelectorAll('.avatar-option').forEach(img => img.classList.remove('selected'));
             element.classList.add('selected');
             
-            // 選擇完畢後自動收起選擇庫
             setTimeout(() => { toggleAvatarSelection(); }, 200);
         }
 
@@ -280,10 +276,9 @@
             
             setTimeout(() => {
                 modal.style.display = 'none';
-                selector.style.display = 'none'; // 關閉個人資料時，順便把頭像庫也重設為隱藏
+                selector.style.display = 'none'; 
             }, 300);
         }
     </script>
 </body>
-</html>
 </html>
