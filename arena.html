@@ -168,10 +168,17 @@
         // === 網頁載入時，讀取從 game.html 設定好的頭像 ===
         window.onload = function() {
             const savedAvatar = localStorage.getItem('playerAvatar');
-            if (savedAvatar) {
-                document.getElementById('arena-avatar').src = savedAvatar;
-            }
-        };
+    if (savedAvatar) {
+        document.getElementById('arena-avatar').src = savedAvatar;
+    }
+    
+    // 新增：同步名字 (記得去 arena.html 的名字標籤加上 id="arena-username")
+    const savedName = localStorage.getItem('playerName');
+    if (savedName) {
+        const nameEl = document.getElementById('arena-username');
+        if (nameEl) nameEl.innerText = savedName;
+    }
+};
 
         // === WebSocket 連線設定 ===
         const ws = new WebSocket('ws://localhost:8765');
