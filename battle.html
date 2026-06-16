@@ -3,210 +3,272 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>星宿魔法師 - 星辰戰場 (動態卡牌版)</title>
+    <title>星宿魔法師 - 星辰對決</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;900&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
         
         body {
-            background-image: url('bg_battle.png');
+            /* 設定戰鬥戰場背景圖 */
+            background-image: url('image_bg_battle.png');
             background-size: cover; background-position: center;
             width: 100vw; height: 100vh; overflow: hidden;
             font-family: 'Noto Serif TC', serif; color: #ffffff;
+            display: flex; flex-direction: column; justify-content: space-between;
+            padding: 30px;
             animation: fadeIn 0.8s ease forwards;
         }
 
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* --- 共用介面設定 --- */
-        .profile-area { position: absolute; display: flex; align-items: center; gap: 15px; z-index: 10; }
-        .avatar { width: 70px; height: 70px; border-radius: 50%; border: 2px solid #a0c0ff; background: rgba(10, 20, 40, 0.8); }
-        .info-box { display: flex; flex-direction: column; }
-        .name { font-size: 18px; font-weight: bold; letter-spacing: 2px; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
-        .level { font-size: 14px; color: #a0c0ff; }
-        
-        .hp-badge { 
-            background: radial-gradient(circle, #ff4d4d, #990000); border: 2px solid #ffd700;
-            width: 35px; height: 35px; border-radius: 50%; display: flex; justify-content: center; align-items: center;
-            font-weight: bold; font-size: 18px; box-shadow: 0 2px 5px rgba(0,0,0,0.5); position: absolute; left: 55px; top: 45px;
+        /* ================= 雙人資訊列 (HUD) ================= */
+        .player-hud {
+            display: flex; align-items: center; gap: 20px;
+            background: linear-gradient(to right, rgba(10, 15, 30, 0.8), rgba(20, 30, 60, 0.4));
+            padding: 15px 30px; border-radius: 15px; width: 450px;
+            border-left: 5px solid #ffd700; border-top: 1px solid rgba(255,255,255,0.1);
+            backdrop-filter: blur(5px); transition: transform 0.2s;
         }
-
-        /* --- 頂部：敵方區 --- */
-        .enemy-profile { top: 20px; left: 30px; }
-        .enemy-resources { position: absolute; top: 30px; right: 30px; display: flex; gap: 20px; align-items: center; font-size: 18px; }
         
-        /* 敵方手牌容器 (目前為空) */
-        .enemy-hand { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); display: flex; gap: 5px; }
+        /* 對手在上方、玩家在下方 */
+        .hud-enemy { align-self: flex-start; border-left-color: #ff4444; }
+        .hud-self { align-self: flex-end; border-left-color: #00ccff; }
 
-        /* --- 中央：戰鬥場地 --- */
-        .battlefield {
+        .battle-avatar {
+            width: 70px; height: 70px; border-radius: 50%;
+            border: 2px solid #fff; object-fit: cover;
+            box-shadow: 0 0 15px rgba(255,255,255,0.2);
+        }
+        .hud-enemy .battle-avatar { border-color: #ff4444; box-shadow: 0 0 15px rgba(255, 68, 68, 0.4); }
+        .hud-self .battle-avatar { border-color: #00ccff; box-shadow: 0 0 15px rgba(0, 204, 255, 0.4); }
+
+        .status-bars { flex-grow: 1; display: flex; flex-direction: column; gap: 8px; }
+        .name-tag { font-size: 18px; font-weight: bold; letter-spacing: 2px; text-shadow: 0 2px 4px #000; }
+        
+        /* 核心計量條外框 */
+        .bar-container { position: relative; width: 100%; height: 16px; background: rgba(0,0,0,0.6); border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); overflow: hidden; }
+        .bar-text { position: absolute; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; font-size: 11px; font-weight: bold; font-family: monospace; z-index: 2; text-shadow: 0 1px 2px #000; }
+        
+        /* 血條動態填滿區 */
+        .hp-fill { 
+            height: 100%; width: 100%; 
+            background: linear-gradient(to right, #ff4444, #ffaa00);
+            transition: width 0.4s cubic-bezier(0.075, 0.82, 0.165, 1); /* 平滑扣血精髓 */
+        }
+        .hud-self .hp-fill { background: linear-gradient(to right, #00ccff, #00ffaa); }
+
+        /* 魔力條動態填滿區 */
+        .mp-fill { height: 100%; width: 100%; background: linear-gradient(to right, #9933ff, #e066ff); transition: width 0.3s ease; }
+
+        /* 被攻擊時的外框震動動畫特效 */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-8px); }
+            40%, 80% { transform: translateX(8px); }
+        }
+        .damaged-shake { animation: shake 0.3s ease-in-out; }
+
+        /* ================= 中央戰場與日誌 ================= */
+        .center-battlefield {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 80%; height: 50%; display: flex; flex-direction: column; justify-content: space-between; align-items: center; padding: 20px 0;
-        }
-        
-        /* 雙方場上角色容器 (目前為空) */
-        .field-row { display: flex; gap: 30px; align-items: center; justify-content: center; width: 100%; min-height: 160px; }
-
-        /* --- 底部：玩家區 --- */
-        .player-profile { bottom: 20px; left: 30px; }
-        
-        /* 玩家手牌容器 (用來動態塞入卡牌) */
-        .player-hand {
-            position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
-            display: flex; justify-content: center; align-items: flex-end; gap: -10px; z-index: 20;
-            height: 250px; width: 60%; /* 給予足夠的寬度容納動態卡牌 */
+            width: 600px; height: 300px; display: flex; flex-direction: column; justify-content: center; align-items: center;
         }
 
-        /* 動態生成的玩家手牌樣式 */
-        .hand-card {
-            width: 140px; height: 200px; background: linear-gradient(to bottom, rgba(30, 40, 80, 0.9), rgba(15, 20, 40, 0.95));
-            border: 1px solid #5bc0eb; border-radius: 10px; margin: 0 -15px; /* 模擬重疊 */
-            position: relative; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); cursor: pointer;
-            box-shadow: -5px 0 15px rgba(0,0,0,0.5); display: flex; flex-direction: column; align-items: center;
-            animation: slideUp 0.3s ease-out forwards; /* 抽卡時的浮現動畫 */
+        .action-log {
+            width: 100%; background: rgba(5, 10, 20, 0.7); border: 1px solid rgba(150, 180, 255, 0.2);
+            border-radius: 10px; padding: 15px; height: 120px; overflow-y: auto;
+            font-size: 14px; line-height: 1.6; color: #a0c0ff; backdrop-filter: blur(3px);
         }
-        .hand-card:hover { transform: translateY(-30px) scale(1.1); z-index: 30; border-color: #ffd700; box-shadow: 0 0 20px rgba(100, 150, 255, 0.6); }
+        .log-entry { margin-bottom: 5px; animation: logFade 0.3s ease; }
+        @keyframes logFade { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-        @keyframes slideUp {
-            from { transform: translateY(50px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
+        /* ================= 右側：快捷測試面板 ================= */
+        .test-panel {
+            position: absolute; right: 30px; top: 50%; transform: translateY(-50%);
+            background: rgba(15, 20, 35, 0.9); border: 2px solid #ffd700; border-radius: 12px;
+            padding: 20px; display: flex; flex-direction: column; gap: 12px; width: 220px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.8); z-index: 20;
         }
-
-        .card-cost { position: absolute; top: 5px; left: 5px; background: rgba(0,0,0,0.6); border: 1px solid #ffd700; color: #ffd700; width: 25px; height: 25px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: bold; }
-        .card-title { margin-top: 15px; font-size: 14px; font-weight: bold; letter-spacing: 2px; }
-
-        /* --- 結束回合按鈕 --- */
-        .end-turn-btn {
-            position: absolute; right: 40px; top: 50%; transform: translateY(-50%);
-            width: 120px; height: 120px; border-radius: 50%;
-            background: radial-gradient(circle, rgba(30, 40, 80, 0.8) 0%, rgba(10, 15, 30, 0.9) 100%);
-            border: 2px solid #ffd700; box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            cursor: pointer; transition: all 0.2s; z-index: 10;
+        .test-title { font-size: 14px; color: #ffd700; text-align: center; font-weight: bold; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 8px; }
+        .test-btn {
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.3); color: #fff;
+            padding: 10px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold; transition: 0.2s;
         }
-        .end-turn-btn:hover { transform: translateY(-50%) scale(1.05); box-shadow: 0 0 30px rgba(255, 215, 0, 0.6); border-color: #fff; }
-        .end-text { font-size: 24px; font-weight: 900; letter-spacing: 4px; text-shadow: 0 0 10px #fff; }
-        .round-text { font-size: 12px; color: #a0c0ff; margin-top: 5px; }
+        .test-btn.dmg-enemy { border-color: #ff4444; color: #ff8888; }
+        .test-btn.dmg-enemy:hover { background: rgba(255,68,68,0.2); transform: scale(1.05); }
+        .test-btn.dmg-self { border-color: #00ccff; color: #88e5ff; }
+        .test-btn.dmg-self:hover { background: rgba(0,204,255,0.2); transform: scale(1.05); }
+        .test-btn.heal { border-color: #44cc44; color: #88ff88; }
+        .test-btn.heal:hover { background: rgba(68,204,68,0.2); transform: scale(1.05); }
 
-        /* 測試用按鈕：抽卡 */
-        .test-draw-btn {
-            position: absolute; bottom: 120px; left: 30px; padding: 10px 20px;
-            background: rgba(255, 215, 0, 0.8); border: none; border-radius: 5px;
-            font-weight: bold; cursor: pointer; z-index: 50; transition: 0.2s;
-        }
-        .test-draw-btn:hover { background: #fff; }
-
+        /* 逃跑退場按鈕 */
+        .escape-btn { background: transparent; border: none; color: rgba(255,255,255,0.4); font-size: 14px; cursor: pointer; text-decoration: underline; margin-top: 10px; text-align: center; }
+        .escape-btn:hover { color: #ff4444; }
     </style>
 </head>
 <body>
 
-    <!-- 頂部：對手資訊 -->
-    <div class="profile-area enemy-profile">
-        <div style="position: relative;">
-            <div class="avatar"></div>
-            <div class="hp-badge">21</div>
-        </div>
-        <div class="info-box">
-            <span class="name">星之觀測者</span>
-            <span class="level">Lv.30</span>
-        </div>
-    </div>
-    <div class="enemy-resources">
-        <span>✨ 8/10</span>
-        <span style="font-size: 24px; cursor: pointer;">⚙️</span>
-    </div>
-
-    <!-- 敵方手牌 (空容器) -->
-    <div class="enemy-hand" id="enemy-hand-container"></div>
-
-    <!-- 中央：戰鬥場地 -->
-    <div class="battlefield">
-        <!-- 敵方場上角色 (空容器) -->
-        <div class="field-row" id="enemy-field"></div>
-        <!-- 玩家場上角色 (空容器) -->
-        <div class="field-row" id="player-field"></div>
-    </div>
-
-    <!-- 底部：玩家資訊 -->
-    <div class="profile-area player-profile">
-        <div style="position: relative;">
-            <div class="avatar"></div>
-            <div class="hp-badge">20</div>
-        </div>
-        <div class="info-box">
-            <span class="name">星辰旅者</span>
-            <span class="level">Lv.30</span>
-            <span style="color:#ffd700; font-size:14px; margin-top:5px;">✨ 7/10</span>
+    <!-- 1. 上方區塊：對手資訊 HUD -->
+    <div class="player-hud hud-enemy" id="hud-enemy">
+        <img src="avatars/avatar3.png" class="battle-avatar" alt="對手頭像" onerror="this.src='avatars/avatar3.png'">
+        <div class="status-bars">
+            <div class="name-tag">暗影使徒 ❖</div>
+            <!-- 對手血條 -->
+            <div class="bar-container">
+                <div class="bar-text" id="enemy-hp-text">HP: 100 / 100</div>
+                <div class="hp-fill" id="enemy-hp-bar" style="width: 100%;"></div>
+            </div>
+            <!-- 對手魔力條 -->
+            <div class="bar-container" style="height: 10px;">
+                <div class="mp-fill" id="enemy-mp-bar" style="width: 100%;"></div>
+            </div>
         </div>
     </div>
 
-    <!-- 玩家手牌 (空容器，等待動態加入) -->
-    <div class="player-hand" id="player-hand-container"></div>
-
-    <!-- 結束回合按鈕 -->
-    <div class="end-turn-btn">
-        <span class="end-text">結束<br>回合</span>
-        <span class="round-text">第 8 回合</span>
+    <!-- 2. 中央區塊：戰場日誌監控 -->
+    <div class="center-battlefield">
+        <div class="action-log" id="combatLog">
+            <div class="log-entry" style="color: #ffd700;">★ 星辰結界已展開，對決正式開始！</div>
+        </div>
     </div>
 
-    <!-- 測試按鈕：模擬從牌組抽卡 -->
-    <button class="test-draw-btn" onclick="drawCard()">🃏 點我抽卡 (測試)</button>
+    <!-- 3. 下方區塊：玩家自身資訊 HUD -->
+    <div class="player-hud hud-self" id="hud-self">
+        <!-- 會自動讀取大廳頭像 -->
+        <img src="avatars/avatar1.png" class="battle-avatar" id="battle-self-avatar" alt="我的頭像" onerror="this.src='avatars/avatar1.png'">
+        <div class="status-bars">
+            <!-- 會自動讀取大廳暱稱 -->
+            <div class="name-tag" id="battle-self-name">星之觀測者</div>
+            <!-- 玩家自身血條 -->
+            <div class="bar-container">
+                <div class="bar-text" id="self-hp-text">HP: 100 / 100</div>
+                <div class="hp-fill" id="self-hp-bar" style="width: 100%;"></div>
+            </div>
+            <!-- 玩家自身魔力條 -->
+            <div class="bar-container" style="height: 10px;">
+                <div class="mp-fill" id="self-mp-bar" style="width: 100%;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. 右側工具：超酷手動調血量測試面板 -->
+    <div class="test-panel">
+        <div class="test-title">🧙‍♂️ 戰場觀測調校面板</div>
+        <button class="test-btn dmg-enemy" onclick="executeAction('enemy_damage', 20)">🔥 轟炸對手 (-20 HP)</button>
+        <button class="test-btn dmg-self" onclick="executeAction('self-damage', 15)">⚡ 對手打我 (-15 HP)</button>
+        <button class="test-btn heal" onclick="executeAction('heal_all', 25)">✨ 聖光集體治療 (+25)</button>
+        <button class="test-btn" onclick="executeAction('use_mp', 30)">🔮 消耗我的魔力 (-30)</button>
+        <button class="escape-btn" onclick="escapeBattle()">🏳️ 認輸撤離戰場</button>
+    </div>
 
     <script>
-        // 卡牌資料庫 (模擬)
-        const cardDatabase = [
-            { name: "星隕術", cost: 2 },
-            { name: "星河護盾", cost: 1 },
-            { name: "星芒裁決", cost: 3 },
-            { name: "命運觀測", cost: 2 },
-            { name: "星體喚醒", cost: 4 }
-        ];
+        // === 戰場核心血量與魔力變數 ===
+        let selfHP = 100;
+        let selfMP = 100;
+        let enemyHP = 100;
+        let enemyMP = 100;
 
-        // 抽卡功能 (動態生成 HTML 元素)
-        function drawCard() {
-            const handContainer = document.getElementById('player-hand-container');
-            
-            // 限制手牌數量，避免無限抽
-            if (handContainer.children.length >= 10) {
-                alert("手牌已滿！");
-                return;
+        // === 初始化：自動載入大廳設定好的形象與暱稱 ===
+        window.onload = function() {
+            const savedAvatar = localStorage.getItem('playerAvatar');
+            if (savedAvatar) {
+                document.getElementById('battle-self-avatar').src = savedAvatar;
+            }
+            const savedName = localStorage.getItem('playerName');
+            if (savedName) {
+                document.getElementById('battle-self-name').innerText = savedName;
+            }
+        };
+
+        // === 動態更動血量與魔力的核心函數 ===
+        function executeAction(actionType, amount) {
+            const logBox = document.getElementById('combatLog');
+            let logText = "";
+
+            if (actionType === 'enemy_damage') {
+                // 扣除對手血量，最低限制為 0
+                enemyHP = Math.max(0, enemyHP - amount);
+                logText = `⚔️ 你吟唱了星辰裂變，對【暗影使徒】造成了 ${amount} 點暴擊傷害！`;
+                
+                // 觸發對手 HUD 畫面震動受擊特效
+                triggerShake('hud-enemy');
+            } 
+            else if (actionType === 'self-damage') {
+                // 扣除自身血量
+                selfHP = Math.max(0, selfHP - amount);
+                logText = `💥 敵方發動了暗影侵蝕，你受到了 ${amount} 點痛擊！`;
+                
+                // 觸發自身 HUD 畫面震動受擊特效
+                triggerShake('hud-self');
+            } 
+            else if (actionType === 'heal_all') {
+                // 集體回血，最高限制為 100
+                selfHP = Math.min(100, selfHP + amount);
+                enemyHP = Math.min(100, enemyHP + amount);
+                selfMP = Math.min(100, selfMP + amount);
+                enemyMP = Math.min(100, enemyMP + amount);
+                logText = `✨ 戰場降下璀璨極光，所有人恢復了 ${amount} 點生命與魔力！`;
+            }
+            else if (actionType === 'use_mp') {
+                selfMP = Math.max(0, selfMP - amount);
+                logText = `🔮 你消耗了 ${amount} 點魔力引導高階星宿法陣。`;
             }
 
-            // 隨機抽一張卡
-            const randomCard = cardDatabase[Math.floor(Math.random() * cardDatabase.length)];
+            // === 驅動前端 UI 畫面更新填滿寬度與文字 ===
+            // 自身數據渲染
+            document.getElementById('self-hp-bar').style.width = selfHP + '%';
+            document.getElementById('self-hp-text').innerText = `HP: ${selfHP} / 100`;
+            document.getElementById('self-mp-bar').style.width = selfMP + '%';
 
-            // 建立一個新的 <div> 元素作為卡牌
-            const newCardElement = document.createElement('div');
-            newCardElement.className = 'hand-card';
-            
-            // 設定卡牌內部的 HTML 結構
-            newCardElement.innerHTML = `
-                <div class="card-cost">${randomCard.cost}</div>
-                <div class="card-title">${randomCard.name}</div>
-            `;
+            // 對手數據渲染
+            document.getElementById('enemy-hp-bar').style.width = enemyHP + '%';
+            document.getElementById('enemy-hp-text').innerText = `HP: ${enemyHP} / 100`;
+            document.getElementById('enemy-mp-bar').style.width = enemyMP + '%';
 
-            // 綁定點擊事件 (出牌)
-            newCardElement.onclick = function() {
-                playCard(this, randomCard.name, randomCard.cost);
-            };
+            // 寫入戰鬥日誌
+            const newLog = document.createElement('div');
+            newLog.className = 'log-entry';
+            newLog.innerText = logText;
+            logBox.appendChild(newLog);
+            logBox.scrollTop = logBox.scrollHeight; // 自動捲動到最下面
 
-            // 將這張卡牌塞入 HTML 的手牌容器中
-            handContainer.appendChild(newCardElement);
+            // 勝負評判檢測
+            checkBattleOver();
         }
 
-        // 出牌功能 (動態移除 HTML 元素)
-        function playCard(cardElement, cardName, cost) {
-            // 加入往上飛並消失的動畫特效
-            cardElement.style.transform = 'translateY(-100px) scale(0)';
-            cardElement.style.opacity = '0';
-            cardElement.style.pointerEvents = 'none'; // 防止動畫過程中重複點擊
-            
-            // 等待動畫跑完 (0.3秒) 後，將元素從畫面中徹底刪除
+        // === 畫面受擊震動小特效 ===
+        function triggerShake(elementId) {
+            const el = document.getElementById(elementId);
+            el.classList.add('damaged-shake');
+            // 動態完畢後立刻把 class 拔掉，下一次才能重複觸發
+            setTimeout(() => { el.classList.remove('damaged-shake'); }, 300);
+        }
+
+        // === 檢測生死勝負 ===
+        function checkBattleOver() {
+            if (selfHP <= 0) {
+                alert("💀 你的生命歸零，敗給了暗影力量... 即將返回競技大廳。");
+                escapeBattle();
+            } else if (enemyHP <= 0) {
+                alert("🏆 勝利！你成功的封印了對手！即將衣錦還鄉返回大廳。");
+                escapeBattle();
+            }
+        }
+
+        // === 認輸/退出戰場 ===
+        function escapeBattle() {
+            document.body.style.opacity = 0;
             setTimeout(() => {
-                cardElement.remove();
-                console.log(`已打出【${cardName}】，消耗法力 ${cost}`);
-            }, 300);
+                window.location.href = 'arena.html';
+            }, 500);
         }
+
+        // === 預留：未來的 WebSocket 真實連線通道 ===
+        // const ws = new WebSocket('ws://localhost:8765');
+        // ws.onmessage = (event) => { 
+        //     const data = JSON.parse(event.data);
+        //     // 未來對手出牌扣血，只要在這裡接收並呼叫 executeAction() 即可！
+        // };
     </script>
 </body>
 </html>
