@@ -9,7 +9,7 @@
         * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
         
         body {
-            background-image: url('bg_lobby.png');
+            background-image: url('image_4daff7.jpg');
             background-size: cover; background-position: center;
             width: 100vw; height: 100vh; overflow: hidden;
             font-family: 'Noto Serif TC', serif; color: #ffffff;
@@ -103,7 +103,16 @@
         .profile-avatar-wrapper:hover::after { opacity: 1; }
         .profile-avatar-wrapper:hover .profile-avatar-large { filter: blur(1px); }
 
-        .profile-details h2 { font-size: 28px; letter-spacing: 3px; margin-bottom: 5px; text-shadow: 0 2px 5px rgba(0,0,0,0.8); }
+        /* 新增：名字與編輯按鈕的排版 */
+        .username-container { display: flex; align-items: center; gap: 10px; margin-bottom: 5px; }
+        .profile-details h2 { font-size: 28px; letter-spacing: 3px; text-shadow: 0 2px 5px rgba(0,0,0,0.8); }
+        
+        .edit-name-btn {
+            background: transparent; border: none; color: #a0c0ff; font-size: 18px; 
+            cursor: pointer; transition: all 0.2s; opacity: 0.6;
+        }
+        .edit-name-btn:hover { color: #ffd700; opacity: 1; transform: scale(1.2); }
+
         .profile-uid { color: #a0c0ff; font-size: 14px; letter-spacing: 1px; margin-bottom: 10px; }
 
         .exp-container { width: 300px; }
@@ -147,7 +156,7 @@
             <img src="avatars/avatar1.png" class="avatar" id="main-avatar" alt="玩家頭像" onerror="this.src=''">
             <div style="display: flex; flex-direction: column;">
                 <span class="player-level">Lv.80</span>
-                <span class="player-name">星之觀測者</span>
+                <span class="player-name" id="main-username">星之觀測者</span>
             </div>
         </div>
         <div class="top-right-menu">
@@ -183,7 +192,10 @@
                     <img src="avatars/avatar1.png" class="profile-avatar-large" id="modal-avatar" alt="玩家頭像" onerror="this.src=''">
                 </div>
                 <div class="profile-details">
-                    <h2>星之觀測者</h2>
+                    <div class="username-container">
+                        <h2 id="modal-username">星之觀測者</h2>
+                        <button class="edit-name-btn" onclick="editUsername()" title="修改使用者名稱">✏️</button>
+                    </div>
                     <div class="profile-uid">UID: 1029384756</div>
                     <div class="exp-container">
                         <div class="exp-text"><span>Lv.80</span><span>24,500 / 30,000 EXP</span></div>
@@ -202,7 +214,7 @@
                 <div class="avatar-selection-title">✦ 選擇觀測者新形象 ✦</div>
                 <div class="avatar-list">
                     <img src="avatars/avatar1.png" class="avatar-option selected" onclick="changeAvatar('avatars/avatar1.png', this)">
-                    <img src="avatars/avatar2.png" class="avatar-option" onclick="changeAvatar('avatars/avatar2.png', this)">
+                    <img src="avatars/avatar2.jpg" class="avatar-option" onclick="changeAvatar('avatars/avatar2.jpg', this)">
                     <img src="avatars/avatar3.png" class="avatar-option" onclick="changeAvatar('avatars/avatar3.png', this)">
                 </div>
             </div>
@@ -210,8 +222,9 @@
     </div>
 
     <script>
-        // === 初始化：載入記憶的頭像 ===
+        // === 初始化：載入記憶的頭像與使用者名稱 ===
         window.onload = function() {
+            // 讀取頭像
             const savedAvatar = localStorage.getItem('playerAvatar');
             if (savedAvatar) {
                 document.getElementById('main-avatar').src = savedAvatar;
@@ -222,7 +235,32 @@
                     else img.classList.remove('selected');
                 });
             }
+
+            // 讀取使用者名稱
+            const savedName = localStorage.getItem('playerName');
+            if (savedName) {
+                document.getElementById('main-username').innerText = savedName;
+                document.getElementById('modal-username').innerText = savedName;
+            }
         };
+
+        // === 修改使用者名稱邏輯 ===
+        function editUsername() {
+            const currentName = document.getElementById('modal-username').innerText;
+            const newName = prompt("請輸入新的使用者名稱（最多 12 個字）：", currentName);
+            
+            // 檢查使用者是否有輸入，且不全是空白
+            if (newName && newName.trim() !== "") {
+                const cleanName = newName.trim().substring(0, 12); // 限制最多 12 個字
+                
+                // 1. 更新畫面上的文字
+                document.getElementById('main-username').innerText = cleanName;
+                document.getElementById('modal-username').innerText = cleanName;
+                
+                // 2. 永久儲存至 localStorage
+                localStorage.setItem('playerName', cleanName);
+            }
+        }
 
         // === 控制頭像選擇庫的展開/收合 ===
         function toggleAvatarSelection() {
