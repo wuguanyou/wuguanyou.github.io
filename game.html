@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>星宿魔法師 - 觀測中</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            /* 這裡準備放你第二張場景圖片 */
+            background-color: #1a1a2e; /* 圖片還沒放之前的備用底色 */
+            /* background-image: url('bg_lobby.png'); */
+            background-size: cover;
+            background-position: center;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            font-family: 'Noto Serif TC', serif;
+            color: #fff;
+            
+            /* 淡入特效 */
+            animation: fadeIn 0.8s ease forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* 左上角返回按鈕 */
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: 'Noto Serif TC', serif;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+
+        /* 遊戲主要互動區塊 (對話框風格) */
+        .game-panel {
+            position: absolute;
+            bottom: 5%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            height: 25%;
+            background: linear-gradient(135deg, rgba(15, 20, 40, 0.85) 0%, rgba(30, 40, 70, 0.85) 100%);
+            border: 2px solid rgba(100, 150, 255, 0.4);
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .character-name {
+            font-size: 24px;
+            color: #ffd700;
+            margin-bottom: 15px;
+            letter-spacing: 2px;
+        }
+
+        .dialogue-text {
+            font-size: 18px;
+            line-height: 1.6;
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+<body>
+
+    <button class="back-btn" onclick="goBack()">← 返回星盤</button>
+
+    <div class="game-panel">
+        <div class="character-name">星宿導師</div>
+        <div class="dialogue-text" id="text-box">
+            「觀測者，你來了。星辰的軌跡已經發生偏轉，我們必須盡快查明原因...」
+        </div>
+    </div>
+
+    <script>
+        function goBack() {
+            document.body.style.transition = "opacity 0.5s ease";
+            document.body.style.opacity = 0;
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 500);
+        }
+    </script>
+</body>
+</html>
