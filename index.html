@@ -223,10 +223,13 @@
     <!-- JavaScript 互動邏輯 -->
     <script>
         function startGame() {
-            // 這裡可以寫進入遊戲的邏輯，例如跳轉到遊戲主畫面 (game.html)
-            // window.location.href = 'game.html';
-            alert("✨ 系統提示：正在連線至星宿伺服器... 準備進入遊戲！");
-        }
+    // 讓畫面變暗淡出，0.5秒後跳轉到 game.html
+    document.body.style.transition = "opacity 0.5s ease";
+    document.body.style.opacity = 0;
+    setTimeout(() => {
+        window.location.href = 'game.html';
+    }, 500);
+}
 
         function openGallery() {
             alert("📖 開啟星宿圖鑑介面");
