@@ -9,266 +9,320 @@
         * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
         
         body {
-            /* 設定戰鬥戰場背景圖 */
-            background-image: url('image_bg_battle.png');
+            background-image: url('bg_battle.png');
             background-size: cover; background-position: center;
             width: 100vw; height: 100vh; overflow: hidden;
             font-family: 'Noto Serif TC', serif; color: #ffffff;
             display: flex; flex-direction: column; justify-content: space-between;
-            padding: 30px;
+            padding: 20px 40px;
             animation: fadeIn 0.8s ease forwards;
         }
 
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* ================= 雙人資訊列 (HUD) ================= */
+        /* ================= 雙方區域容器 ================= */
+        .player-zone { display: flex; flex-direction: column; gap: 15px; }
+        .enemy-zone { align-items: center; }
+        .self-zone { align-items: center; }
+
+        /* ================= 主戰者資訊列 (HUD) ================= */
         .player-hud {
-            display: flex; align-items: center; gap: 20px;
-            background: linear-gradient(to right, rgba(10, 15, 30, 0.8), rgba(20, 30, 60, 0.4));
-            padding: 15px 30px; border-radius: 15px; width: 450px;
-            border-left: 5px solid #ffd700; border-top: 1px solid rgba(255,255,255,0.1);
-            backdrop-filter: blur(5px); transition: transform 0.2s;
+            display: flex; align-items: center; gap: 15px;
+            background: linear-gradient(to right, rgba(10, 15, 30, 0.8), rgba(20, 30, 60, 0.6));
+            padding: 10px 20px; border-radius: 50px; width: 400px;
+            border: 2px solid rgba(255,255,255,0.2); backdrop-filter: blur(5px);
         }
-        
-        /* 對手在上方、玩家在下方 */
-        .hud-enemy { align-self: flex-start; border-left-color: #ff4444; }
-        .hud-self { align-self: flex-end; border-left-color: #00ccff; }
+        .hud-enemy { border-color: #ff4444; }
+        .hud-self { border-color: #00ccff; }
 
-        .battle-avatar {
-            width: 70px; height: 70px; border-radius: 50%;
-            border: 2px solid #fff; object-fit: cover;
-            box-shadow: 0 0 15px rgba(255,255,255,0.2);
-        }
-        .hud-enemy .battle-avatar { border-color: #ff4444; box-shadow: 0 0 15px rgba(255, 68, 68, 0.4); }
-        .hud-self .battle-avatar { border-color: #00ccff; box-shadow: 0 0 15px rgba(0, 204, 255, 0.4); }
-
-        .status-bars { flex-grow: 1; display: flex; flex-direction: column; gap: 8px; }
-        .name-tag { font-size: 18px; font-weight: bold; letter-spacing: 2px; text-shadow: 0 2px 4px #000; }
+        .battle-avatar { width: 50px; height: 50px; border-radius: 50%; border: 2px solid #fff; object-fit: cover; }
+        .status-bars { flex-grow: 1; display: flex; flex-direction: column; gap: 5px; }
+        .name-tag { font-size: 16px; font-weight: bold; text-shadow: 0 2px 4px #000; }
         
-        /* 核心計量條外框 */
-        .bar-container { position: relative; width: 100%; height: 16px; background: rgba(0,0,0,0.6); border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); overflow: hidden; }
-        .bar-text { position: absolute; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; font-size: 11px; font-weight: bold; font-family: monospace; z-index: 2; text-shadow: 0 1px 2px #000; }
+        .bar-container { position: relative; width: 100%; height: 14px; background: rgba(0,0,0,0.6); border-radius: 7px; overflow: hidden; border: 1px solid rgba(255,255,255,0.2); }
+        .bar-text { position: absolute; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; font-size: 10px; font-weight: bold; z-index: 2; }
         
-        /* 血條動態填滿區 */
-        .hp-fill { 
-            height: 100%; width: 100%; 
-            background: linear-gradient(to right, #ff4444, #ffaa00);
-            transition: width 0.4s cubic-bezier(0.075, 0.82, 0.165, 1); /* 平滑扣血精髓 */
-        }
+        .hp-fill { height: 100%; width: 100%; transition: width 0.4s ease; }
+        .hud-enemy .hp-fill { background: linear-gradient(to right, #ff4444, #ffaa00); }
         .hud-self .hp-fill { background: linear-gradient(to right, #00ccff, #00ffaa); }
 
-        /* 魔力條動態填滿區 */
-        .mp-fill { height: 100%; width: 100%; background: linear-gradient(to right, #9933ff, #e066ff); transition: width 0.3s ease; }
-
-        /* 被攻擊時的外框震動動畫特效 */
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            20%, 60% { transform: translateX(-8px); }
-            40%, 80% { transform: translateX(8px); }
+        /* ================= 戰場角色卡牌區域 (四星宿) ================= */
+        .board-row { display: flex; gap: 20px; justify-content: center; }
+        
+        .char-card {
+            width: 100px; height: 140px;
+            background: linear-gradient(to bottom, rgba(30, 40, 60, 0.9), rgba(10, 15, 25, 0.9));
+            border: 2px solid #5bc0eb; border-radius: 8px;
+            display: flex; flex-direction: column; align-items: center; padding: 5px;
+            position: relative; box-shadow: 0 5px 15px rgba(0,0,0,0.6);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        .damaged-shake { animation: shake 0.3s ease-in-out; }
+        .enemy-card { border-color: #ff4444; }
+        
+        .char-card.dead { filter: grayscale(100%) brightness(0.4); border-color: #555; }
+        .char-card:hover:not(.dead) { transform: translateY(-10px) scale(1.05); box-shadow: 0 0 15px #ffd700; border-color: #ffd700; z-index: 10; cursor: pointer; }
 
-        /* ================= 中央戰場與日誌 ================= */
-        .center-battlefield {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 600px; height: 300px; display: flex; flex-direction: column; justify-content: center; align-items: center;
+        .char-img { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 1px solid rgba(255,255,255,0.3); margin-top: 5px; }
+        .char-name { font-size: 12px; font-weight: bold; color: #e0e0e0; margin-top: 5px; letter-spacing: 1px; }
+
+        /* 攻擊力與血量標籤 */
+        .char-stats {
+            display: flex; justify-content: space-between; width: 100%;
+            position: absolute; bottom: 5px; padding: 0 10px; font-size: 16px; font-weight: 900;
+            text-shadow: 0 0 4px #000, 0 0 4px #000;
         }
+        .stat-atk { color: #ffcc00; display: flex; align-items: center; gap: 2px; }
+        .stat-atk::before { content: "⚔️"; font-size: 12px; }
+        .stat-hp { color: #ff4444; display: flex; align-items: center; gap: 2px; }
+        .stat-hp::before { content: "❤️"; font-size: 12px; }
 
+        /* 受擊動畫 */
+        @keyframes damageShake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-5px); } 40%, 80% { transform: translateX(5px); } }
+        .taking-damage { animation: damageShake 0.3s ease; }
+        
+        /* 攻擊動畫 (向前撲) */
+        @keyframes attackDashSelf { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-40px); z-index: 20; } }
+        @keyframes attackDashEnemy { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(40px); z-index: 20; } }
+        .attacking-self { animation: attackDashSelf 0.4s ease; }
+        .attacking-enemy { animation: attackDashEnemy 0.4s ease; }
+
+        /* ================= 中央戰場日誌 ================= */
+        .center-battlefield { flex-grow: 1; display: flex; justify-content: center; align-items: center; padding: 10px 0; }
         .action-log {
-            width: 100%; background: rgba(5, 10, 20, 0.7); border: 1px solid rgba(150, 180, 255, 0.2);
-            border-radius: 10px; padding: 15px; height: 120px; overflow-y: auto;
-            font-size: 14px; line-height: 1.6; color: #a0c0ff; backdrop-filter: blur(3px);
+            width: 500px; background: rgba(5, 10, 20, 0.5); border: 1px solid rgba(150, 180, 255, 0.2);
+            border-radius: 10px; padding: 15px; height: 100px; overflow-y: auto;
+            font-size: 13px; line-height: 1.6; color: #a0c0ff; backdrop-filter: blur(2px);
         }
         .log-entry { margin-bottom: 5px; animation: logFade 0.3s ease; }
         @keyframes logFade { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
         /* ================= 右側：快捷測試面板 ================= */
         .test-panel {
-            position: absolute; right: 30px; top: 50%; transform: translateY(-50%);
+            position: absolute; right: 20px; top: 50%; transform: translateY(-50%);
             background: rgba(15, 20, 35, 0.9); border: 2px solid #ffd700; border-radius: 12px;
-            padding: 20px; display: flex; flex-direction: column; gap: 12px; width: 220px;
-            box-shadow: 0 0 20px rgba(0,0,0,0.8); z-index: 20;
+            padding: 15px; display: flex; flex-direction: column; gap: 10px; width: 200px; z-index: 100;
         }
-        .test-title { font-size: 14px; color: #ffd700; text-align: center; font-weight: bold; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 8px; }
-        .test-btn {
-            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.3); color: #fff;
-            padding: 10px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold; transition: 0.2s;
-        }
-        .test-btn.dmg-enemy { border-color: #ff4444; color: #ff8888; }
-        .test-btn.dmg-enemy:hover { background: rgba(255,68,68,0.2); transform: scale(1.05); }
-        .test-btn.dmg-self { border-color: #00ccff; color: #88e5ff; }
-        .test-btn.dmg-self:hover { background: rgba(0,204,255,0.2); transform: scale(1.05); }
-        .test-btn.heal { border-color: #44cc44; color: #88ff88; }
-        .test-btn.heal:hover { background: rgba(68,204,68,0.2); transform: scale(1.05); }
-
-        /* 逃跑退場按鈕 */
-        .escape-btn { background: transparent; border: none; color: rgba(255,255,255,0.4); font-size: 14px; cursor: pointer; text-decoration: underline; margin-top: 10px; text-align: center; }
+        .test-title { font-size: 13px; color: #ffd700; text-align: center; font-weight: bold; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 5px; }
+        .test-btn { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3); color: #fff; padding: 8px; border-radius: 6px; cursor: pointer; font-size: 12px; transition: 0.2s; }
+        .test-btn:hover { background: rgba(255,215,0,0.2); border-color: #ffd700; }
+        .escape-btn { background: transparent; border: none; color: rgba(255,255,255,0.4); font-size: 12px; cursor: pointer; text-decoration: underline; margin-top: 5px; text-align: center; }
         .escape-btn:hover { color: #ff4444; }
+
     </style>
 </head>
 <body>
 
-    <!-- 1. 上方區塊：對手資訊 HUD -->
-    <div class="player-hud hud-enemy" id="hud-enemy">
-        <img src="avatars/avatar3.png" class="battle-avatar" alt="對手頭像" onerror="this.src='avatars/avatar3.png'">
-        <div class="status-bars">
-            <div class="name-tag">暗影使徒 ❖</div>
-            <!-- 對手血條 -->
-            <div class="bar-container">
-                <div class="bar-text" id="enemy-hp-text">HP: 100 / 100</div>
-                <div class="hp-fill" id="enemy-hp-bar" style="width: 100%;"></div>
+    <!-- 1. 敵方區域 (包含主戰者 HUD 與 4 隻角色) -->
+    <div class="player-zone enemy-zone">
+        <div class="player-hud hud-enemy">
+            <img src="avatars/avatar3.png" class="battle-avatar">
+            <div class="status-bars">
+                <div class="name-tag">暗影大魔導</div>
+                <div class="bar-container">
+                    <div class="bar-text" id="enemy-hp-text">HP: 30 / 30</div>
+                    <div class="hp-fill" id="enemy-hp-bar" style="width: 100%;"></div>
+                </div>
             </div>
-            <!-- 對手魔力條 -->
-            <div class="bar-container" style="height: 10px;">
-                <div class="mp-fill" id="enemy-mp-bar" style="width: 100%;"></div>
-            </div>
+        </div>
+        
+        <!-- 敵方 4 隻星宿 -->
+        <div class="board-row" id="enemy-board">
+            <!-- 透過 JS 動態生成 -->
         </div>
     </div>
 
-    <!-- 2. 中央區塊：戰場日誌監控 -->
+    <!-- 2. 中央戰場日誌 -->
     <div class="center-battlefield">
         <div class="action-log" id="combatLog">
-            <div class="log-entry" style="color: #ffd700;">★ 星辰結界已展開，對決正式開始！</div>
+            <div class="log-entry" style="color: #ffd700;">★ 雙方星宿皆已佈陣，對決正式開始！</div>
         </div>
     </div>
 
-    <!-- 3. 下方區塊：玩家自身資訊 HUD -->
-    <div class="player-hud hud-self" id="hud-self">
-        <!-- 會自動讀取大廳頭像 -->
-        <img src="avatars/avatar1.png" class="battle-avatar" id="battle-self-avatar" alt="我的頭像" onerror="this.src='avatars/avatar1.png'">
-        <div class="status-bars">
-            <!-- 會自動讀取大廳暱稱 -->
-            <div class="name-tag" id="battle-self-name">星之觀測者</div>
-            <!-- 玩家自身血條 -->
-            <div class="bar-container">
-                <div class="bar-text" id="self-hp-text">HP: 100 / 100</div>
-                <div class="hp-fill" id="self-hp-bar" style="width: 100%;"></div>
-            </div>
-            <!-- 玩家自身魔力條 -->
-            <div class="bar-container" style="height: 10px;">
-                <div class="mp-fill" id="self-mp-bar" style="width: 100%;"></div>
+    <!-- 3. 我方區域 (包含 4 隻角色與主戰者 HUD) -->
+    <div class="player-zone self-zone">
+        <!-- 我方 4 隻星宿 -->
+        <div class="board-row" id="self-board">
+            <!-- 透過 JS 動態生成 -->
+        </div>
+
+        <div class="player-hud hud-self">
+            <img src="avatars/avatar1.png" class="battle-avatar" id="battle-self-avatar">
+            <div class="status-bars">
+                <div class="name-tag" id="battle-self-name">星之觀測者</div>
+                <div class="bar-container">
+                    <div class="bar-text" id="self-hp-text">HP: 30 / 30</div>
+                    <div class="hp-fill" id="self-hp-bar" style="width: 100%;"></div>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- 4. 右側工具：超酷手動調血量測試面板 -->
+    <!-- 4. 戰鬥測試面板 -->
     <div class="test-panel">
-        <div class="test-title">🧙‍♂️ 戰場觀測調校面板</div>
-        <button class="test-btn dmg-enemy" onclick="executeAction('enemy_damage', 20)">🔥 轟炸對手 (-20 HP)</button>
-        <button class="test-btn dmg-self" onclick="executeAction('self-damage', 15)">⚡ 對手打我 (-15 HP)</button>
-        <button class="test-btn heal" onclick="executeAction('heal_all', 25)">✨ 聖光集體治療 (+25)</button>
-        <button class="test-btn" onclick="executeAction('use_mp', 30)">🔮 消耗我的魔力 (-30)</button>
-        <button class="escape-btn" onclick="escapeBattle()">🏳️ 認輸撤離戰場</button>
+        <div class="test-title">⚔️ 角色交互測試</div>
+        <button class="test-btn" onclick="testAttack('self', 0, 'enemy', 0)">🟢 我方 1 號 攻擊 敵方 1 號</button>
+        <button class="test-btn" onclick="testAttack('enemy', 2, 'self', 1)">🔴 敵方 3 號 攻擊 我方 2 號</button>
+        <button class="test-btn" onclick="testDirectDamage('self')">⚡ 敵方直接攻擊我方主戰者 (-5)</button>
+        <button class="test-btn" onclick="testDirectDamage('enemy')">🔥 我方法術轟炸敵方主戰者 (-5)</button>
+        <button class="escape-btn" onclick="escapeBattle()">🏳️ 撤離戰場</button>
     </div>
 
     <script>
-        // === 戰場核心血量與魔力變數 ===
-        let selfHP = 100;
-        let selfMP = 100;
-        let enemyHP = 100;
-        let enemyMP = 100;
+        // === 雙方主戰者血量 (百聞牌預設通常是 30 HP) ===
+        let mainHp = { self: 30, enemy: 30 };
 
-        // === 初始化：自動載入大廳設定好的形象與暱稱 ===
+        // === 雙方星宿角色資料 ===
+        const selfCharacters = [
+            { id: 's0', name: '青龍武士', img: 'avatars/avatar1.png', atk: 3, hp: 5, maxHp: 5, dead: false },
+            { id: 's1', name: '烈焰朱雀', img: 'avatars/avatar1.png', atk: 4, hp: 3, maxHp: 3, dead: false },
+            { id: 's2', name: '大地玄武', img: 'avatars/avatar1.png', atk: 1, hp: 7, maxHp: 7, dead: false },
+            { id: 's3', name: '迅雷白虎', img: 'avatars/avatar1.png', atk: 5, hp: 2, maxHp: 2, dead: false }
+        ];
+
+        const enemyCharacters = [
+            { id: 'e0', name: '暗影刺客', img: 'avatars/avatar3.png', atk: 4, hp: 2, maxHp: 2, dead: false },
+            { id: 'e1', name: '深淵巨魔', img: 'avatars/avatar3.png', atk: 2, hp: 6, maxHp: 6, dead: false },
+            { id: 'e2', name: '亡靈巫師', img: 'avatars/avatar3.png', atk: 3, hp: 4, maxHp: 4, dead: false },
+            { id: 'e3', name: '恐懼之眼', img: 'avatars/avatar3.png', atk: 1, hp: 8, maxHp: 8, dead: false }
+        ];
+
         window.onload = function() {
+            // 同步大廳資料
             const savedAvatar = localStorage.getItem('playerAvatar');
             if (savedAvatar) {
                 document.getElementById('battle-self-avatar').src = savedAvatar;
+                selfCharacters.forEach(c => c.img = savedAvatar); // 將我方小怪頭像也統一換成玩家的（可視需求更改）
             }
             const savedName = localStorage.getItem('playerName');
-            if (savedName) {
-                document.getElementById('battle-self-name').innerText = savedName;
-            }
+            if (savedName) document.getElementById('battle-self-name').innerText = savedName;
+
+            // 初始化渲染卡牌
+            renderBoard('self-board', selfCharacters, 'self-card');
+            renderBoard('enemy-board', enemyCharacters, 'enemy-card');
         };
 
-        // === 動態更動血量與魔力的核心函數 ===
-        function executeAction(actionType, amount) {
-            const logBox = document.getElementById('combatLog');
-            let logText = "";
-
-            if (actionType === 'enemy_damage') {
-                // 扣除對手血量，最低限制為 0
-                enemyHP = Math.max(0, enemyHP - amount);
-                logText = `⚔️ 你吟唱了星辰裂變，對【暗影使徒】造成了 ${amount} 點暴擊傷害！`;
+        // === 渲染戰場上的 4 隻角色 ===
+        function renderBoard(containerId, characters, customClass) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = ''; // 清空
+            
+            characters.forEach((char, index) => {
+                const card = document.createElement('div');
+                card.className = `char-card ${customClass}`;
+                card.id = char.id;
                 
-                // 觸發對手 HUD 畫面震動受擊特效
-                triggerShake('hud-enemy');
-            } 
-            else if (actionType === 'self-damage') {
-                // 扣除自身血量
-                selfHP = Math.max(0, selfHP - amount);
-                logText = `💥 敵方發動了暗影侵蝕，你受到了 ${amount} 點痛擊！`;
-                
-                // 觸發自身 HUD 畫面震動受擊特效
-                triggerShake('hud-self');
-            } 
-            else if (actionType === 'heal_all') {
-                // 集體回血，最高限制為 100
-                selfHP = Math.min(100, selfHP + amount);
-                enemyHP = Math.min(100, enemyHP + amount);
-                selfMP = Math.min(100, selfMP + amount);
-                enemyMP = Math.min(100, enemyMP + amount);
-                logText = `✨ 戰場降下璀璨極光，所有人恢復了 ${amount} 點生命與魔力！`;
-            }
-            else if (actionType === 'use_mp') {
-                selfMP = Math.max(0, selfMP - amount);
-                logText = `🔮 你消耗了 ${amount} 點魔力引導高階星宿法陣。`;
-            }
+                if (char.dead) card.classList.add('dead');
 
-            // === 驅動前端 UI 畫面更新填滿寬度與文字 ===
-            // 自身數據渲染
-            document.getElementById('self-hp-bar').style.width = selfHP + '%';
-            document.getElementById('self-hp-text').innerText = `HP: ${selfHP} / 100`;
-            document.getElementById('self-mp-bar').style.width = selfMP + '%';
-
-            // 對手數據渲染
-            document.getElementById('enemy-hp-bar').style.width = enemyHP + '%';
-            document.getElementById('enemy-hp-text').innerText = `HP: ${enemyHP} / 100`;
-            document.getElementById('enemy-mp-bar').style.width = enemyMP + '%';
-
-            // 寫入戰鬥日誌
-            const newLog = document.createElement('div');
-            newLog.className = 'log-entry';
-            newLog.innerText = logText;
-            logBox.appendChild(newLog);
-            logBox.scrollTop = logBox.scrollHeight; // 自動捲動到最下面
-
-            // 勝負評判檢測
-            checkBattleOver();
+                card.innerHTML = `
+                    <img src="${char.img}" class="char-img">
+                    <div class="char-name">${char.name}</div>
+                    <div class="char-stats">
+                        <span class="stat-atk" id="${char.id}-atk">${char.atk}</span>
+                        <span class="stat-hp" id="${char.id}-hp">${char.hp}</span>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
         }
 
-        // === 畫面受擊震動小特效 ===
+        // === 戰鬥邏輯：角色互撞 (互相造成等同於攻擊力的傷害) ===
+        function testAttack(attackerTeam, attackerIdx, targetTeam, targetIdx) {
+            const attackers = attackerTeam === 'self' ? selfCharacters : enemyCharacters;
+            const targets = targetTeam === 'self' ? selfCharacters : enemyCharacters;
+            
+            const attacker = attackers[attackerIdx];
+            const target = targets[targetIdx];
+
+            if (attacker.dead) return alert(`⚠️ ${attacker.name} 已經陣亡，無法攻擊！`);
+            if (target.dead) return alert(`⚠️ 目標 ${target.name} 已經是屍體了！`);
+
+            // 1. 播放攻擊者向前衝的動畫
+            const attackerDOM = document.getElementById(attacker.id);
+            attackerDOM.classList.add(attackerTeam === 'self' ? 'attacking-self' : 'attacking-enemy');
+            
+            setTimeout(() => {
+                attackerDOM.classList.remove('attacking-self', 'attacking-enemy');
+                
+                // 2. 結算傷害：互相扣血
+                target.hp -= attacker.atk;
+                attacker.hp -= target.atk; // 反擊傷害
+
+                // 播放受擊動畫
+                triggerShake(target.id);
+                triggerShake(attacker.id);
+
+                // 紀錄日誌
+                addLog(`⚔️ 【${attacker.name}】攻擊了【${target.name}】！雙方互相造成傷害。`);
+
+                // 檢查是否死亡並更新畫面
+                checkDeath(attacker);
+                checkDeath(target);
+                updateCardUI(attacker);
+                updateCardUI(target);
+
+            }, 200); // 配合 CSS 動畫時間
+        }
+
+        // === 戰鬥邏輯：直接攻擊主戰者 ===
+        function testDirectDamage(targetTeam) {
+            const damage = 5;
+            if (targetTeam === 'self') {
+                mainHp.self = Math.max(0, mainHp.self - damage);
+                document.getElementById('self-hp-bar').style.width = (mainHp.self / 30 * 100) + '%';
+                document.getElementById('self-hp-text').innerText = `HP: ${mainHp.self} / 30`;
+                addLog(`💥 敵方越過防線，直接對你造成了 ${damage} 點傷害！`);
+            } else {
+                mainHp.enemy = Math.max(0, mainHp.enemy - damage);
+                document.getElementById('enemy-hp-bar').style.width = (mainHp.enemy / 30 * 100) + '%';
+                document.getElementById('enemy-hp-text').innerText = `HP: ${mainHp.enemy} / 30`;
+                addLog(`🔥 你的法術轟炸了敵方主將，造成 ${damage} 點傷害！`);
+            }
+            
+            if (mainHp.self === 0) alert("💀 主戰者血量歸零，你輸了...");
+            if (mainHp.enemy === 0) alert("🏆 敵方主戰者倒下，你贏得了勝利！");
+        }
+
+        // === 更新單張卡牌數據 ===
+        function updateCardUI(char) {
+            if (char.dead) return; // 已死亡在 checkDeath 處理
+            document.getElementById(`${char.id}-hp`).innerText = char.hp;
+            document.getElementById(`${char.id}-atk`).innerText = char.atk;
+        }
+
+        // === 檢查角色是否死亡 ===
+        function checkDeath(char) {
+            if (char.hp <= 0 && !char.dead) {
+                char.hp = 0;
+                char.dead = true;
+                const cardDOM = document.getElementById(char.id);
+                cardDOM.classList.add('dead');
+                document.getElementById(`${char.id}-hp`).innerText = 0;
+                addLog(`💀 【${char.name}】承受不住傷害，倒下了。`);
+            }
+        }
+
+        // === 小工具：畫面震動與日誌 ===
         function triggerShake(elementId) {
             const el = document.getElementById(elementId);
-            el.classList.add('damaged-shake');
-            // 動態完畢後立刻把 class 拔掉，下一次才能重複觸發
-            setTimeout(() => { el.classList.remove('damaged-shake'); }, 300);
-        }
-
-        // === 檢測生死勝負 ===
-        function checkBattleOver() {
-            if (selfHP <= 0) {
-                alert("💀 你的生命歸零，敗給了暗影力量... 即將返回競技大廳。");
-                escapeBattle();
-            } else if (enemyHP <= 0) {
-                alert("🏆 勝利！你成功的封印了對手！即將衣錦還鄉返回大廳。");
-                escapeBattle();
+            if(el) {
+                el.classList.add('taking-damage');
+                setTimeout(() => el.classList.remove('taking-damage'), 300);
             }
         }
 
-        // === 認輸/退出戰場 ===
-        function escapeBattle() {
-            document.body.style.opacity = 0;
-            setTimeout(() => {
-                window.location.href = 'arena.html';
-            }, 500);
+        function addLog(text) {
+            const logBox = document.getElementById('combatLog');
+            const newLog = document.createElement('div');
+            newLog.className = 'log-entry';
+            newLog.innerText = text;
+            logBox.appendChild(newLog);
+            logBox.scrollTop = logBox.scrollHeight;
         }
 
-        // === 預留：未來的 WebSocket 真實連線通道 ===
-        // const ws = new WebSocket('ws://localhost:8765');
-        // ws.onmessage = (event) => { 
-        //     const data = JSON.parse(event.data);
-        //     // 未來對手出牌扣血，只要在這裡接收並呼叫 executeAction() 即可！
-        // };
+        function escapeBattle() {
+            document.body.style.opacity = 0;
+            setTimeout(() => { window.location.href = 'arena.html'; }, 500);
+        }
     </script>
 </body>
 </html>
