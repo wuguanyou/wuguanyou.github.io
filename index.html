@@ -3,249 +3,180 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>星宿魔法師 ASTRAL CHRONICLE</title>
-    <!-- 引入高質感的思源宋體，符合魔法與星空的優雅氛圍 -->
+    <title>星宿魔法師 - 登入系統</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;900&display=swap" rel="stylesheet">
     <style>
-        /* 重置基本樣式 */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            user-select: none; /* 防止文字被選取，更有遊戲感 */
-        }
-
-        body {
-            /* 設定你的圖片為背景 */
-            background-image: url('Index pic.png');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            width: 100vw;
-            height: 100vh;
-            overflow: hidden; /* 防止滾動條 */
-            font-family: 'Noto Serif TC', serif;
-            color: #ffffff;
-        }
-
-        /* 遊戲主要畫面容器 */
-        #game-container {
-            width: 100%;
-            height: 100%;
-            position: relative;
-            /* 加上一層非常淡的黑色漸層，讓左側文字更清楚 */
-            background: linear-gradient(to right, rgba(0,0,15,0.6) 0%, rgba(0,0,15,0) 50%);
-        }
-
-        /* 左側選單區域排版 */
-        .left-menu {
-            position: absolute;
-            top: 15%;
-            left: 8%;
-            display: flex;
-            flex-direction: column;
-            gap: 30px; /* 標題與按鈕群的間距 */
-        }
-
-        /* 標題區塊 */
-        .title-area {
-            margin-bottom: 20px;
-            /* 為了避免與原圖文字重疊太嚴重，這裡如果原圖已經有字，可以考慮隱藏。
-               但為了示範特效，我先把文字排出來 */
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
         
-        .main-title {
-            font-size: 64px;
-            font-weight: 900;
-            letter-spacing: 5px;
-            text-shadow: 0 0 10px rgba(255, 255, 255, 0.8), 0 0 20px rgba(100, 150, 255, 0.5);
-            margin-bottom: 5px;
+        body {
+            background-image: url('image_4daff7.jpg'); /* 對接你的背景圖 */
+            background-size: cover; background-position: center;
+            width: 100vw; height: 100vh; overflow: hidden;
+            font-family: 'Noto Serif TC', serif; color: #ffffff;
+            display: flex; justify-content: center; align-items: center;
+            animation: fadeIn 1s ease forwards;
         }
 
-        .sub-title {
-            font-size: 20px;
-            letter-spacing: 8px;
-            color: #d0e0ff;
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* ================= 登入面板 ================= */
+        .login-card {
+            width: 450px;
+            background: linear-gradient(135deg, rgba(15, 25, 50, 0.85), rgba(5, 10, 20, 0.95));
+            border: 2px solid rgba(91, 192, 235, 0.5); border-radius: 20px;
+            padding: 40px 30px;
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(91, 192, 235, 0.2);
+            backdrop-filter: blur(10px); text-align: center; position: relative;
         }
 
-        .tagline {
-            font-size: 16px;
-            margin-top: 15px;
-            letter-spacing: 3px;
-            color: #ffd700; /* 星光般的金色 */
-        }
+        .game-title { font-size: 36px; font-weight: 900; letter-spacing: 6px; color: #ffffff; text-shadow: 0 0 15px rgba(255, 215, 0, 0.6), 0 4px 10px rgba(0,0,0,0.9); margin-bottom: 5px; }
+        .game-subtitle { font-size: 12px; color: #5bc0eb; letter-spacing: 4px; margin-bottom: 30px; font-weight: bold; }
 
-        /* 按鈕群組 */
-        .button-group {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
+        /* 輸入框與標籤 */
+        .input-group { margin-bottom: 25px; text-align: left; }
+        .input-label { font-size: 14px; color: #ffd700; margin-bottom: 10px; display: block; letter-spacing: 2px; font-weight: 600; }
+        
+        .nickname-input {
+            width: 100%; background: rgba(0, 0, 0, 0.5); border: 1px solid rgba(150, 180, 255, 0.4); border-radius: 30px;
+            padding: 12px 25px; font-size: 16px; color: #fff; text-align: center; outline: none; transition: 0.3s;
         }
+        .nickname-input:focus { border-color: #ffd700; background: rgba(0, 0, 0, 0.7); box-shadow: 0 0 15px rgba(255, 215, 0, 0.3); }
 
-        /* 個別按鈕設計 */
-        .menu-btn {
-            background: transparent;
-            border: none;
-            color: white;
-            text-align: left;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            padding: 10px;
-            transition: all 0.3s ease; /* 動畫過渡效果 */
-            width: fit-content;
-        }
+        /* 頭像選擇區 */
+        .avatar-list { display: flex; gap: 20px; justify-content: center; margin-top: 10px; margin-bottom: 30px; }
+        .avatar-option { width: 75px; height: 75px; border-radius: 50%; object-fit: cover; border: 2px solid transparent; cursor: pointer; transition: 0.2s; opacity: 0.4; background: #fff; }
+        .avatar-option:hover { opacity: 0.8; transform: scale(1.05); }
+        .avatar-option.selected { border-color: #ffd700; opacity: 1; box-shadow: 0 0 15px rgba(255, 215, 0, 0.6); transform: scale(1.1); }
 
-        .menu-btn:hover {
-            transform: translateX(15px) scale(1.05); /* 滑鼠碰到時向右移動並稍微放大 */
-            text-shadow: 0 0 15px #fff, 0 0 30px #5bc0eb;
-        }
+        /* === 歡迎回來模式 (已有帳號) === */
+        .welcome-back-box { display: none; flex-direction: column; align-items: center; margin-bottom: 30px; background: rgba(0,0,0,0.4); padding: 20px; border-radius: 15px; border: 1px solid rgba(255,215,0,0.3); }
+        .welcome-avatar { width: 90px; height: 90px; border-radius: 50%; border: 3px solid #ffd700; margin-bottom: 15px; object-fit: cover; box-shadow: 0 0 15px rgba(255,215,0,0.5); }
+        .welcome-text { font-size: 18px; color: #fff; margin-bottom: 5px; font-weight: bold; letter-spacing: 2px; }
+        .welcome-uid { font-size: 14px; color: #a0c0ff; font-family: monospace; letter-spacing: 1px; background: rgba(0,0,0,0.5); padding: 5px 15px; border-radius: 20px; }
 
-        .btn-icon {
-            font-size: 28px;
-            color: #ffd700;
-            transition: transform 0.3s ease;
-        }
+        /* 按鈕區 */
+        .start-btn { width: 100%; background: linear-gradient(to right, rgba(255,215,0,0.2), rgba(255,170,0,0.2)); border: 2px solid #ffd700; color: #ffd700; padding: 14px; border-radius: 40px; font-size: 18px; font-weight: 900; letter-spacing: 6px; cursor: pointer; transition: 0.3s; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+        .start-btn:hover { background: #ffd700; color: #050a14; box-shadow: 0 0 25px rgba(255, 215, 0, 0.5); transform: translateY(-2px); }
+        
+        .switch-account-btn { background: transparent; border: none; color: rgba(255,255,255,0.4); font-size: 12px; cursor: pointer; text-decoration: underline; margin-top: 20px; letter-spacing: 1px; }
+        .switch-account-btn:hover { color: #ff4444; }
 
-        .menu-btn:hover .btn-icon {
-            transform: rotate(90deg); /* 圖示旋轉特效 */
-        }
-
-        .btn-text-cn {
-            font-size: 28px;
-            font-weight: 600;
-            letter-spacing: 3px;
-            display: block;
-        }
-
-        .btn-text-en {
-            font-size: 12px;
-            letter-spacing: 2px;
-            color: #a0c0ff;
-            display: block;
-            margin-top: 2px;
-        }
-
-        /* 左下角版本號 */
-        .version {
-            position: absolute;
-            bottom: 30px;
-            left: 30px;
-            font-size: 14px;
-            color: rgba(255, 255, 255, 0.6);
-            font-family: sans-serif;
-        }
-
-        /* 右下角公告按鈕 */
-        .notice-btn {
-            position: absolute;
-            bottom: 30px;
-            right: 50px;
-            background: transparent;
-            border: none;
-            color: white;
-            cursor: pointer;
-            text-align: center;
-            transition: transform 0.2s;
-        }
-
-        .notice-btn:hover {
-            transform: scale(1.1);
-            text-shadow: 0 0 10px #fff;
-        }
-
-        .notice-icon {
-            font-size: 32px;
-            margin-bottom: 5px;
-            display: block;
-        }
+        /* 預設區塊顯示控制 */
+        #register-section { display: block; }
     </style>
 </head>
 <body>
 
-    <div id="game-container">
-        <!-- 左側主選單 -->
-        <div class="left-menu">
-            <!-- 標題區 (如果之後背景圖去除了文字，這塊就能完美填補) -->
-            <div class="title-area">
-                <h1 class="main-title">星宿魔法師</h1>
-                <div class="sub-title">ASTRAL CHRONICLE</div>
-                <div class="tagline">✧ 群星為引 · 命運為軌 ✧</div>
+    <div class="login-card">
+        <h1 class="game-title">星宿魔法師</h1>
+        <div class="game-subtitle">- Astro Magician -</div>
+
+        <!-- 區塊A：第一次玩，註冊新帳號 -->
+        <div id="register-section">
+            <div class="input-group">
+                <label class="input-label">✦ 締結契約的真名</label>
+                <input type="text" id="username" class="nickname-input" placeholder="輸入您的魔法師暱稱..." autocomplete="off" maxlength="12">
             </div>
 
-            <!-- 按鈕區 -->
-            <div class="button-group">
-                <button class="menu-btn" onclick="startGame()">
-                    <span class="btn-icon">✧</span>
-                    <div>
-                        <span class="btn-text-cn">開始觀測</span>
-                        <span class="btn-text-en">START GAME</span>
-                    </div>
-                </button>
-
-                <button class="menu-btn" onclick="openGallery()">
-                    <span class="btn-icon">◈</span>
-                    <div>
-                        <span class="btn-text-cn">星宿圖鑑</span>
-                        <span class="btn-text-en">GALLERY</span>
-                    </div>
-                </button>
-
-                <button class="menu-btn" onclick="openChronicle()">
-                    <span class="btn-icon">✦</span>
-                    <div>
-                        <span class="btn-text-cn">命運紀錄</span>
-                        <span class="btn-text-en">CHRONICLE</span>
-                    </div>
-                </button>
-
-                <button class="menu-btn" onclick="openSettings()">
-                    <span class="btn-icon">❂</span>
-                    <div>
-                        <span class="btn-text-cn">設定</span>
-                        <span class="btn-text-en">SETTINGS</span>
-                    </div>
-                </button>
+            <div class="input-group">
+                <label class="input-label">✦ 選擇初始形象</label>
+                <div class="avatar-list">
+                    <img src="avatars/avatar1.png" class="avatar-option selected" onclick="selectAvatar('avatars/avatar1.png', this)">
+                    <img src="avatars/avatar2.jpg" class="avatar-option" onclick="selectAvatar('avatars/avatar2.jpg', this)">
+                    <img src="avatars/avatar3.png" class="avatar-option" onclick="selectAvatar('avatars/avatar3.png', this)">
+                </div>
             </div>
+
+            <button class="start-btn" onclick="createAccount()">建立帳號並登入</button>
         </div>
 
-        <!-- 左下角 -->
-        <div class="version">Ver.1.0.0</div>
+        <!-- 區塊B：老玩家，歡迎回來 (預設隱藏) -->
+        <div id="login-section" class="welcome-back-box">
+            <img src="avatars/avatar1.png" id="saved-avatar" class="welcome-avatar" onerror="this.src='avatars/avatar1.png'">
+            <div class="welcome-text" id="saved-name">星之觀測者，歡迎回來</div>
+            <div class="welcome-uid" id="saved-uid">UID: 10293847</div>
+        </div>
+        
+        <button class="start-btn" id="quick-login-btn" style="display: none;" onclick="enterGame()">進入星辰大廳</button>
+        <button class="switch-account-btn" id="switch-btn" style="display: none;" onclick="clearAccount()">切換帳號 (清除目前資料)</button>
 
-        <!-- 右下角公告 -->
-        <button class="notice-btn" onclick="openNotice()">
-            <span class="notice-icon">🎁</span>
-            <span style="font-size: 14px; letter-spacing: 1px;">公告</span>
-        </button>
     </div>
 
-    <!-- JavaScript 互動邏輯 -->
     <script>
-        function startGame() {
-    // 讓畫面變暗淡出，0.5秒後跳轉到 game.html
-    document.body.style.transition = "opacity 0.5s ease";
-    document.body.style.opacity = 0;
-    setTimeout(() => {
-        window.location.href = 'game.html';
-    }, 500);
-}
+        let selectedAvatarPath = 'avatars/avatar1.png';
 
-        function openGallery() {
-            alert("📖 開啟星宿圖鑑介面");
+        // === 1. 網頁載入時檢查是否已有帳號 ===
+        window.onload = function() {
+            const savedUID = localStorage.getItem('playerUID');
+            
+            if (savedUID) {
+                // 有帳號 -> 顯示「歡迎回來」介面
+                document.getElementById('register-section').style.display = 'none';
+                
+                document.getElementById('login-section').style.display = 'flex';
+                document.getElementById('quick-login-btn').style.display = 'block';
+                document.getElementById('switch-btn').style.display = 'block';
+
+                document.getElementById('saved-avatar').src = localStorage.getItem('playerAvatar');
+                document.getElementById('saved-name').innerText = localStorage.getItem('playerName') + "，歡迎回來";
+                document.getElementById('saved-uid').innerText = "UID: " + savedUID;
+            } else {
+                // 沒帳號 -> 顯示「註冊」介面
+                document.getElementById('register-section').style.display = 'block';
+                document.getElementById('login-section').style.display = 'none';
+                document.getElementById('quick-login-btn').style.display = 'none';
+                document.getElementById('switch-btn').style.display = 'none';
+            }
+        };
+
+        // === 2. 選擇頭像互動 ===
+        function selectAvatar(path, element) {
+            selectedAvatarPath = path;
+            document.querySelectorAll('.avatar-option').forEach(img => img.classList.remove('selected'));
+            element.classList.add('selected');
         }
 
-        function openChronicle() {
-            alert("📜 開啟命運紀錄介面");
+        // === 3. 建立新帳號並產生 UID ===
+        function createAccount() {
+            const nameInput = document.getElementById('username').value.trim();
+            const finalName = nameInput !== "" ? nameInput : "星之觀測者";
+
+            // 生成一組隨機的 8 位數 UID (例如: 84729104)
+            const newUID = Math.floor(10000000 + Math.random() * 90000000).toString();
+
+            // 存入 localStorage
+            localStorage.setItem('playerUID', newUID);
+            localStorage.setItem('playerName', finalName);
+            localStorage.setItem('playerAvatar', selectedAvatarPath);
+
+            // 初始化新玩家的資源
+            localStorage.setItem('playerCoins', "10,000"); // 新手送一萬金幣
+            localStorage.setItem('playerDiamonds', "500"); // 新手送五百鑽石
+            localStorage.setItem('playerMatches', "0");
+            localStorage.setItem('playerWinRate', "0%");
+            localStorage.setItem('playerCollection', "0/50");
+
+            alert(`🎉 帳號建立成功！\n\n您的專屬魔法師身分碼為：【 UID: ${newUID} 】\n請妥善保管，即將為您轉送至星辰大廳...`);
+            enterGame();
         }
 
-        function openSettings() {
-            alert("⚙️ 開啟遊戲設定");
+        // === 4. 清除帳號 (重置) ===
+        function clearAccount() {
+            if(confirm("⚠️ 確定要清除當前設備上的帳號資料嗎？這將會讓您失去目前的 UID 與金幣！")) {
+                localStorage.clear();
+                window.location.reload(); // 重新整理網頁，回到建立帳號畫面
+            }
         }
 
-        function openNotice() {
-            alert("🎁 最新公告：歡迎來到《星宿魔法師》Beta 測試！");
+        // === 5. 跳轉進入遊戲大廳 ===
+        function enterGame() {
+            document.body.style.opacity = 0;
+            setTimeout(() => {
+                window.location.href = 'game.html';
+            }, 500);
         }
     </script>
+</body>
+</html>
 </body>
 </html>
