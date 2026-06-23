@@ -9,7 +9,7 @@
         * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; touch-action: none; /* 禁用預設滾動，防拖曳干擾 */ }
         
         body {
-            background-image: url('image_bg_battle.png');
+            background-image: url('bg_battle.png');
             background-size: cover; background-position: center;
             width: 100vw; height: 100vh; overflow: hidden;
             font-family: 'Noto Serif TC', serif; color: #ffffff;
@@ -47,7 +47,7 @@
         .hud-self .hp-fill { background: linear-gradient(to right, #00ccff, #00ffaa); }
 
         /* ================= 戰場角色卡牌區域 (四星宿) ================= */
-        .board-row { display: flex; gap: 20px; justify-content: center; position: relative; }
+        .board-row { display: flex; gap: 20px; justify-content: center; position: relative; min-height: 140px; }
         
         .char-card {
             width: 100px; height: 140px;
@@ -68,7 +68,7 @@
         .char-card.dead { filter: grayscale(100%) brightness(0.4); border-color: #555; pointer-events: none; }
         .char-card:hover:not(.dead):not(.dragging) { transform: translateY(-10px) scale(1.05); box-shadow: 0 0 15px #ffd700; border-color: #ffd700; z-index: 10; }
 
-        .char-img { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 1px solid rgba(255,255,255,0.3); margin-top: 5px; pointer-events: none; }
+        .char-img { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 1px solid rgba(255,255,255,0.3); margin-top: 5px; pointer-events: none; background: #fff; }
         .char-name { font-size: 12px; font-weight: bold; color: #e0e0e0; margin-top: 5px; letter-spacing: 1px; pointer-events: none; }
 
         .char-stats {
@@ -121,9 +121,9 @@
 
     <div class="player-zone enemy-zone">
         <div class="player-hud hud-enemy" id="hud-enemy">
-            <img src="avatars/avatar3.png" class="battle-avatar">
+            <img src="avatars/avatar3.png" class="battle-avatar" id="enemy-master-avatar">
             <div class="status-bars">
-                <div class="name-tag">暗影大魔導</div>
+                <div class="name-tag" id="enemy-master-name">正在等待巫師入局...</div>
                 <div class="bar-container">
                     <div class="bar-text" id="enemy-hp-text">HP: 30 / 30</div>
                     <div class="hp-fill" id="enemy-hp-bar" style="width: 100%;"></div>
@@ -138,7 +138,7 @@
     <div class="center-battlefield">
         <div class="drag-indicator">⬆ 將角色往上拖曳出陣攻擊 ⬆</div>
         <div class="action-log" id="combatLog">
-            <div class="log-entry" style="color: #ffd700;">★ 雙方星宿皆已佈陣，對決正式開始！</div>
+            <div class="log-entry" style="color: #ffd700;">★ 正在等待星辰軌道對接...</div>
         </div>
     </div>
 
@@ -160,49 +160,86 @@
 
     <div class="test-panel">
         <div class="test-title">⚔️ 觀測者面板</div>
-        <button class="test-btn" onclick="enemyRandomAttack()">🔴 敵方隨機發起攻擊</button>
-        <button class="test-btn" onclick="testDirectDamage('self')">⚡ 敵方技能轟炸主戰者</button>
+        <button class="test-btn" onclick="enemyRandomAttack()">🔴 單機：敵方隨機攻擊</button>
+        <button class="test-btn" onclick="applyCombatDamage('enemy', null, null, 'master')">⚡ 單機：轟炸主戰者</button>
         <button class="escape-btn" onclick="escapeBattle()">🏳️ 撤離戰場</button>
     </div>
 
     <script>
-        // === 主戰者血量 ===
+        // === 戰鬥基礎變數 ===
         let mainHp = { self: 30, enemy: 30 };
+        let selfCharacters = [];
+        let enemyCharacters = [];
 
-        // === 星宿角色資料 ===
-        const selfCharacters = [
-            { id: 's0', name: '青龍武士', img: 'avatars/avatar1.png', atk: 3, hp: 5, maxHp: 5, dead: false },
-            { id: 's1', name: '烈焰朱雀', img: 'avatars/avatar1.png', atk: 4, hp: 3, maxHp: 3, dead: false },
-            { id: 's2', name: '大地玄武', img: 'avatars/avatar1.png', atk: 1, hp: 7, maxHp: 7, dead: false },
-            { id: 's3', name: '迅雷白虎', img: 'avatars/avatar1.png', atk: 5, hp: 2, maxHp: 2, dead: false }
-        ];
-
-        const enemyCharacters = [
-            { id: 'e0', name: '暗影刺客', img: 'avatars/avatar3.png', atk: 4, hp: 2, maxHp: 2, dead: false },
-            { id: 'e1', name: '深淵巨魔', img: 'avatars/avatar3.png', atk: 2, hp: 6, maxHp: 6, dead: false },
-            { id: 'e2', name: '亡靈巫師', img: 'avatars/avatar3.png', atk: 3, hp: 4, maxHp: 4, dead: false },
-            { id: 'e3', name: '恐懼之眼', img: 'avatars/avatar3.png', atk: 1, hp: 8, maxHp: 8, dead: false }
-        ];
-
-        // 拖曳相關變數
+        // 拖曳狀態控制
         let isDragging = false;
         let activeCardDOM = null;
         let startY = 0;
         let startX = 0;
 
-        window.onload = function() {
-            // 1. 讀取大廳資料
-            const savedAvatar = localStorage.getItem('playerAvatar');
-            if (savedAvatar) {
-                document.getElementById('battle-self-avatar').src = savedAvatar;
-                selfCharacters.forEach(c => c.img = savedAvatar); 
-            }
-            const savedName = localStorage.getItem('playerName');
-            if (savedName) document.getElementById('battle-self-name').innerText = savedName;
+        // === 聯網核心：讀取網頁房號參數與 WebSocket 設定 ===
+        const urlParams = new URLSearchParams(window.location.search);
+        const roomId = urlParams.get('room');
+        const ws = new WebSocket('ws://localhost:8765');
 
-            // 2. 渲染陣列
+        // === 網頁載入與資料初始化 ===
+        window.onload = function() {
+            // 1. 同步大廳資料
+            const savedAvatar = localStorage.getItem('playerAvatar') || 'avatars/avatar1.png';
+            const savedName = localStorage.getItem('playerName') || '星之觀測者';
+            document.getElementById('battle-self-avatar').src = savedAvatar;
+            document.getElementById('battle-self-name').innerText = savedName;
+
+            // 2. 從 localStorage 讀取玩家在 deck.html 編好的牌組
+            const savedDeck = JSON.parse(localStorage.getItem('playerDeck')) || [
+                { name: '青龍武士', atk: 3, hp: 5 }, { name: '烈焰朱雀', atk: 4, hp: 3 },
+                { name: '大地玄武', atk: 1, hp: 7 }, { name: '迅雷白虎', atk: 5, hp: 2 }
+            ];
+
+            // 轉化為戰鬥用的資料格式
+            selfCharacters = savedDeck.map((char, index) => ({
+                id: 's' + index, name: char.name, img: savedAvatar, atk: char.atk, hp: char.hp, maxHp: char.hp, dead: false
+            }));
+
+            // 渲染我方陣容
             renderBoard('self-board', selfCharacters, 'self-card');
-            renderBoard('enemy-board', enemyCharacters, 'enemy-card');
+
+            // 3. 連線建立後，向後端發送自己的入房資訊與牌組
+            ws.onopen = () => {
+                if(roomId) {
+                    ws.send(JSON.stringify({
+                        action: "join_battle",
+                        room_id: roomId,
+                        uid: localStorage.getItem('playerUID'),
+                        name: savedName,
+                        avatar: savedAvatar,
+                        deck: savedDeck
+                    }));
+                }
+            };
+        };
+
+        // === 網路訊息接收與分發 ===
+        ws.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            
+            // 💡 收到後端配發的對手資料，渲染真實對手
+            if (data.action === "battle_start") {
+                document.getElementById('enemy-master-name').innerText = data.opp_name;
+                document.getElementById('enemy-master-avatar').src = data.opp_avatar || 'avatars/avatar3.png';
+                
+                enemyCharacters = data.opp_deck.map((char, index) => ({
+                    id: 'e' + index, name: char.name, img: data.opp_avatar || 'avatars/avatar3.png', atk: char.atk, hp: char.hp, maxHp: char.hp, dead: false
+                }));
+                
+                renderBoard('enemy-board', enemyCharacters, 'enemy-card');
+                document.getElementById('combatLog').innerHTML = ''; // 清空等待訊息
+                addLog(`✨ 傳輸陣同步完畢！對手【${data.opp_name}】已就位，對決開始！`);
+            }
+            // 💡 收到對手的攻擊指令，演繹對手打過來的畫面
+            else if (data.action === "opponent_action") {
+                applyCombatDamage('enemy', data.attacker_idx, data.target_idx, data.target_type);
+            }
         };
 
         // === 渲染戰場 ===
@@ -237,6 +274,9 @@
         function bindDragEvents(cardDOM, charData) {
             cardDOM.addEventListener('pointerdown', (e) => {
                 if(charData.dead || cardDOM.classList.contains('attacking-self')) return;
+                // 防止對面還沒載入就開打
+                if(enemyCharacters.length === 0 && !window.location.search.includes('test')) return; 
+
                 isDragging = true;
                 activeCardDOM = cardDOM;
                 startY = e.clientY;
@@ -276,39 +316,41 @@
             cardDOM.addEventListener('pointercancel', releaseHandler);
         }
 
-        // 執行拖曳後的自動尋敵與攻擊結算
+        // === 執行拖曳後的自動尋敵與連線結算 ===
         function executeDragAttack(attackerChar, attackerDOM) {
             attackerDOM.style.transform = ''; // 清除拖曳行跡
             attackerDOM.classList.add('attacking-self'); // 播放衝鋒動畫
 
+            // 找出我方發起攻擊的角色 Index
+            const attackerIdx = selfCharacters.findIndex(c => c.id === attackerChar.id);
+
             setTimeout(() => {
-                // 尋找存活的敵人
                 const aliveEnemies = enemyCharacters.filter(c => !c.dead);
                 
                 if (aliveEnemies.length > 0) {
                     // 隨機選一個存活敵人撞上去
                     const target = aliveEnemies[Math.floor(Math.random() * aliveEnemies.length)];
-                    target.hp -= attackerChar.atk;
-                    attackerChar.hp -= target.atk; // 敵人反擊
+                    const targetIdx = enemyCharacters.findIndex(c => c.id === target.id);
                     
-                    triggerShake(target.id);
-                    triggerShake(attackerChar.id);
-                    addLog(`⚔️ 【${attackerChar.name}】出陣，與【${target.name}】激烈交鋒！雙方互扣血量。`);
+                    // 1. 本地演繹扣血
+                    applyCombatDamage('self', attackerIdx, targetIdx, 'char');
                     
-                    checkDeath(target);
-                    checkDeath(attackerChar);
-                    updateCardUI(target);
-                    updateCardUI(attackerChar);
+                    // 2. 廣播給對手
+                    if (ws.readyState === WebSocket.OPEN) {
+                        ws.send(JSON.stringify({
+                            action: "battle_action", room_id: roomId,
+                            attacker_idx: attackerIdx, target_idx: targetIdx, target_type: 'char'
+                        }));
+                    }
                 } else {
                     // 敵方全滅，直接攻擊主戰者！
-                    mainHp.enemy -= attackerChar.atk;
-                    triggerShake('hud-enemy');
-                    document.getElementById('enemy-hp-bar').style.width = (mainHp.enemy / 30 * 100) + '%';
-                    document.getElementById('enemy-hp-text').innerText = `HP: ${mainHp.enemy} / 30`;
-                    addLog(`🔥 敵方前排已空！【${attackerChar.name}】直取敵方主戰者，造成 ${attackerChar.atk} 點傷害！`);
+                    applyCombatDamage('self', attackerIdx, null, 'master');
                     
-                    if (mainHp.enemy <= 0) {
-                        setTimeout(() => { alert("🏆 敵方主戰者倒下，你贏得了勝利！"); escapeBattle(); }, 300);
+                    if (ws.readyState === WebSocket.OPEN) {
+                        ws.send(JSON.stringify({
+                            action: "battle_action", room_id: roomId,
+                            attacker_idx: attackerIdx, target_idx: null, target_type: 'master'
+                        }));
                     }
                 }
             }, 200); // 動畫撞擊瞬間
@@ -319,67 +361,87 @@
             }, 500);
         }
 
-        // ================= 敵方自動隨機攻擊 (測試用) =================
-        function enemyRandomAttack() {
-            const aliveEnemies = enemyCharacters.filter(c => !c.dead);
-            const aliveSelf = selfCharacters.filter(c => !c.dead);
-
-            if (aliveEnemies.length === 0) return alert("敵方星宿已全滅！");
-            
-            // 隨機派一隻敵方出陣
-            const attacker = aliveEnemies[Math.floor(Math.random() * aliveEnemies.length)];
-            const attackerDOM = document.getElementById(attacker.id);
-            
-            attackerDOM.classList.add('attacking-enemy');
-
-            setTimeout(() => {
-                if (aliveSelf.length > 0) {
-                    // 打我方星宿
-                    const target = aliveSelf[Math.floor(Math.random() * aliveSelf.length)];
+        // ================= 雙向支援的戰鬥結算引擎 =================
+        function applyCombatDamage(side, attackerIdx, targetIdx, targetType) {
+            if (side === 'self') {
+                const attacker = selfCharacters[attackerIdx];
+                if (targetType === 'char') {
+                    const target = enemyCharacters[targetIdx];
                     target.hp -= attacker.atk;
-                    attacker.hp -= target.atk;
+                    attacker.hp -= target.atk; // 敵人反擊
                     
                     triggerShake(target.id);
                     triggerShake(attacker.id);
-                    addLog(`🔴 敵方【${attacker.name}】突襲，與你的【${target.name}】發生交戰！`);
+                    addLog(`⚔️ 我方【${attacker.name}】出陣，與敵方【${target.name}】猛烈互撞！`);
                     
-                    checkDeath(target);
-                    checkDeath(attacker);
-                    updateCardUI(target);
-                    updateCardUI(attacker);
+                    checkDeath(target); checkDeath(attacker);
+                    updateCardUI(target); updateCardUI(attacker);
                 } else {
-                    // 打我方主戰者
-                    mainHp.self -= attacker.atk;
-                    triggerShake('hud-self');
-                    document.getElementById('self-hp-bar').style.width = (mainHp.self / 30 * 100) + '%';
-                    document.getElementById('self-hp-text').innerText = `HP: ${mainHp.self} / 30`;
-                    addLog(`💥 你的防線被突破！敵方【${attacker.name}】直接攻擊了你！`);
-                    if (mainHp.self <= 0) {
-                        setTimeout(() => { alert("💀 主戰者血量歸零，你輸了..."); escapeBattle(); }, 300);
-                    }
+                    mainHp.enemy -= attacker.atk;
+                    triggerShake('hud-enemy');
+                    document.getElementById('enemy-hp-bar').style.width = (mainHp.enemy / 30 * 100) + '%';
+                    document.getElementById('enemy-hp-text').innerText = `HP: ${mainHp.enemy} / 30`;
+                    addLog(`🔥 敵方前排已空！【${attacker.name}】直取對手主將，造成 ${attacker.atk} 點傷害！`);
+                    
+                    if (mainHp.enemy <= 0) setTimeout(() => { alert("🏆 對手主將倒下，你贏得了勝利！"); escapeBattle(); }, 400);
                 }
-            }, 200);
-
-            setTimeout(() => attackerDOM.classList.remove('attacking-enemy'), 500);
-        }
-
-        // === 直接技能轟炸主戰者 ===
-        function testDirectDamage(targetTeam) {
-            const damage = 5;
-            if (targetTeam === 'self') {
-                mainHp.self = Math.max(0, mainHp.self - damage);
-                document.getElementById('self-hp-bar').style.width = (mainHp.self / 30 * 100) + '%';
-                document.getElementById('self-hp-text').innerText = `HP: ${mainHp.self} / 30`;
-                addLog(`💥 敵方發動隕石術，直接對你造成了 ${damage} 點傷害！`);
-                if (mainHp.self === 0) { alert("💀 主戰者血量歸零，你輸了..."); escapeBattle(); }
+            } 
+            else if (side === 'enemy') {
+                // 對手發起攻擊，我們要替對手的牌播衝鋒動畫
+                const attacker = enemyCharacters[attackerIdx];
+                const attackerDOM = document.getElementById(attacker?.id);
+                if (attackerDOM) attackerDOM.classList.add('attacking-enemy');
+                
+                setTimeout(() => {
+                    if (attackerDOM) attackerDOM.classList.remove('attacking-enemy');
+                    
+                    if (targetType === 'char') {
+                        const target = selfCharacters[targetIdx];
+                        target.hp -= attacker.atk;
+                        attacker.hp -= target.atk;
+                        
+                        triggerShake(target.id);
+                        triggerShake(attacker.id);
+                        addLog(`🔴 敵方【${attacker.name}】突襲，與你的【${target.name}】發生交戰！`);
+                        
+                        checkDeath(target); checkDeath(attacker);
+                        updateCardUI(target); updateCardUI(attacker);
+                    } else {
+                        const dmg = attacker ? attacker.atk : 5; // 防呆預設值
+                        mainHp.self -= dmg;
+                        triggerShake('hud-self');
+                        document.getElementById('self-hp-bar').style.width = (mainHp.self / 30 * 100) + '%';
+                        document.getElementById('self-hp-text').innerText = `HP: ${mainHp.self} / 30`;
+                        addLog(`💥 你的防線被突破！遭受了 ${dmg} 點致命打擊！`);
+                        
+                        if (mainHp.self <= 0) setTimeout(() => { alert("💀 主戰者血量歸零，你輸了..."); escapeBattle(); }, 400);
+                    }
+                }, 200);
             }
         }
 
-        // === 更新 UI 與死亡檢測 ===
+        // === 本機單人測試用：隨機叫對手打我 ===
+        function enemyRandomAttack() {
+            const aliveEnemies = enemyCharacters.filter(c => !c.dead);
+            const aliveSelf = selfCharacters.filter(c => !c.dead);
+            if (aliveEnemies.length === 0) return alert("對手已全滅！");
+            
+            const attacker = aliveEnemies[Math.floor(Math.random() * aliveEnemies.length)];
+            const attackerIdx = enemyCharacters.findIndex(c => c.id === attacker.id);
+            
+            if (aliveSelf.length > 0) {
+                const target = aliveSelf[Math.floor(Math.random() * aliveSelf.length)];
+                const targetIdx = selfCharacters.findIndex(c => c.id === target.id);
+                applyCombatDamage('enemy', attackerIdx, targetIdx, 'char');
+            } else {
+                applyCombatDamage('enemy', attackerIdx, null, 'master');
+            }
+        }
+
+        // === UI 更新小幫手 ===
         function updateCardUI(char) {
             if (char.dead) return;
-            document.getElementById(`${char.id}-hp`).innerText = char.hp;
-            document.getElementById(`${char.id}-atk`).innerText = char.atk;
+            document.getElementById(`${char.id}-hp`).innerText = Math.max(0, char.hp);
         }
 
         function checkDeath(char) {
@@ -387,7 +449,7 @@
                 char.hp = 0;
                 char.dead = true;
                 const cardDOM = document.getElementById(char.id);
-                cardDOM.classList.add('dead');
+                if (cardDOM) cardDOM.classList.add('dead');
                 document.getElementById(`${char.id}-hp`).innerText = 0;
                 addLog(`💀 【${char.name}】承受不住傷害，化為星塵消散了。`);
             }
