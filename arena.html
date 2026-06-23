@@ -112,18 +112,14 @@
 </head>
 <body>
 
-    <!-- 頂部資訊列 -->
     <header>
         <div class="player-profile" onclick="goBack()">
-            <!-- 自動抓取 localStorage 中的最新頭像 -->
             <img src="avatars/avatar1.png" class="avatar" id="arena-avatar" alt="玩家頭像" onerror="this.src='avatars/avatar1.png'">
             <div class="player-info">
                 <span class="player-level">Lv.80</span>
-                <!-- 自動抓取 localStorage 中的最新玩家暱稱 -->
                 <span class="player-name" id="arena-username">星之觀測者</span>
             </div>
         </div>
-        <!-- 自動同步修改後的金幣與鑽石 -->
         <div class="top-right-menu">
             <div class="resource-item">🪙 <span id="arena-coins">128,450</span></div>
             <div class="resource-item">💎 <span id="arena-diamonds">8,920</span></div>
@@ -131,33 +127,27 @@
         </div>
     </header>
 
-    <!-- 左上角返回按鈕 -->
     <div class="back-nav" onclick="goBack()">← 返回大廳</div>
 
-    <!-- 中央核心按鈕區 -->
     <div class="center-menu">
-        <!-- 1. 快速配對 -->
         <div class="arena-btn" onclick="startMatchmaking()">
             <div class="btn-side-icon">✧</div>
             <div class="btn-text-box"><div class="btn-title">玩家配對</div><div class="btn-subtitle">- QUICK MATCH -</div></div>
             <div class="btn-side-icon">✧</div>
         </div>
 
-        <!-- 2. 創建私人房間 -->
         <div class="arena-btn" onclick="createRoom()">
             <div class="btn-side-icon">🚪</div>
             <div class="btn-text-box"><div class="btn-title">創建房間</div><div class="btn-subtitle">- CREATE ROOM -</div></div>
             <div class="btn-side-icon">🚪</div>
         </div>
 
-        <!-- 3. 輸入指定房號/密碼加入 -->
         <div class="arena-btn" onclick="joinPrivateRoom()">
             <div class="btn-side-icon">🔑</div>
             <div class="btn-text-box"><div class="btn-title">加入房間</div><div class="btn-subtitle">- JOIN ROOM -</div></div>
             <div class="btn-side-icon">🔑</div>
         </div>
 
-        <!-- 4. 點開看當前有哪些開放房間 -->
         <div class="arena-btn" onclick="openRoomList()">
             <div class="btn-side-icon">📜</div>
             <div class="btn-text-box"><div class="btn-title">房間列表</div><div class="btn-subtitle">- ROOM LOBBY -</div></div>
@@ -165,7 +155,6 @@
         </div>
     </div>
 
-    <!-- 房間列表彈出視窗 -->
     <div class="modal-overlay" id="roomModal">
         <div class="room-modal" id="roomCard">
             <div class="modal-header">
@@ -213,8 +202,10 @@
             } else if (data.action === "match_success") {
                 alert("⚔️ 成功配對！即將進入戰場...");
                 document.body.style.opacity = 0;
-                // 準確跳轉到對決戰場頁面
-                setTimeout(() => { window.location.href = 'battle.html'; }, 500);
+                // 💡 準確跳轉到對決戰場頁面，並透過 URL 傳遞分配好的房間 ID
+                setTimeout(() => { 
+                    window.location.href = 'battle.html?room=' + data.room_id; 
+                }, 500);
             } else if (data.action === "error") {
                 alert("⚠️ " + data.msg);
             }
@@ -251,9 +242,20 @@
             setTimeout(() => { window.location.href = 'game.html'; }, 500);
         }
 
+        // 💡 更新：發送配對請求時，附上本機玩家的 UID 與名稱防分身自己打自己
         function startMatchmaking() {
-            if (ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ action: "match" }));
-            else alert("伺服器未連線。請確認後端 Python server.py 是否正常啟動中！");
+            if (ws.readyState === WebSocket.OPEN) {
+                const uid = localStorage.getItem('playerUID');
+                const name = localStorage.getItem('playerName') || "未知巫師";
+                
+                ws.send(JSON.stringify({ 
+                    action: "match",
+                    uid: uid,
+                    name: name
+                }));
+            } else {
+                alert("伺服器未連線。請確認後端 Python server.py 是否正常啟動中！");
+            }
         }
 
         function createRoom() {
