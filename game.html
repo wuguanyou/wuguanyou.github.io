@@ -9,7 +9,8 @@
         * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
         
         body {
-            background-image: url('bg_lobby.png');
+            /* 若背景圖不同請自行更換檔名 */
+            background-image: url('image_4daff7.jpg');
             background-size: cover; background-position: center;
             width: 100vw; height: 100vh; overflow: hidden;
             font-family: 'Noto Serif TC', serif; color: #ffffff;
@@ -138,7 +139,7 @@
         <div class="top-right-menu">
             <div class="resource-item" onclick="editData('coins')" title="修改金幣數量">🪙 <span id="res-coins">128,450</span> +</div>
             <div class="resource-item" onclick="editData('diamonds')" title="修改鑽石數量">💎 <span id="res-diamonds">8,920</span> +</div>
-            <button class="sys-btn">⚙️</button>
+            <button class="sys-btn" onclick="alert('系統設定即將開放！')">⚙️</button>
         </div>
     </header>
 
@@ -147,18 +148,20 @@
         <div class="action-card" onclick="enterArena()">
             <div class="card-icon">✧</div><div class="card-title">對戰配對</div><div class="card-subtitle">進入星辰競技場</div>
         </div>
-        <div class="action-card" onclick="alert('進入卡牌編輯')">
+        <!-- 💡 這裡改成觸發跳轉至卡牌編輯 (deck.html) -->
+        <div class="action-card" onclick="enterDeck()">
             <div class="card-icon">◈</div><div class="card-title">卡牌編輯</div><div class="card-subtitle">組建專屬卡組</div>
         </div>
-        <div class="action-card" onclick="alert('進入星宿召喚')">
+        <div class="action-card" onclick="alert('進入星宿召喚 (開發中)')">
             <div class="card-icon">✦</div><div class="card-title">星宿召喚</div><div class="card-subtitle">召喚星辰使徒</div>
         </div>
-        <div class="action-card" onclick="alert('開啟圖鑑')">
+        <div class="action-card" onclick="alert('開啟圖鑑 (開發中)')">
             <div class="card-icon">❂</div><div class="card-title">圖鑑</div><div class="card-subtitle">查看收集圖鑑</div>
         </div>
     </div>
 
-    <button class="back-home" onclick="goBack()">← 返回星盤</button>
+    <!-- 退出登入並返回 index.html -->
+    <button class="back-home" onclick="goBack()">← 返回登入畫面</button>
 
     <!-- 玩家名片彈出視窗 -->
     <div class="modal-overlay" id="profileModal">
@@ -174,7 +177,8 @@
                         <h2 id="modal-username">星之觀測者</h2>
                         <button class="edit-name-btn" onclick="editUsername()" title="修改使用者名稱">✏️</button>
                     </div>
-                    <div class="profile-uid">UID: 1029384756</div>
+                    <!-- 💡 加上 id="dynamic-uid" 讓系統動態注入登入的 UID -->
+                    <div class="profile-uid" id="dynamic-uid">UID: --------</div>
                     <div class="exp-container">
                         <div class="exp-text"><span>Lv.80</span><span>24,500 / 30,000 EXP</span></div>
                         <div class="exp-bar-bg"><div class="exp-bar-fill"></div></div>
@@ -213,7 +217,13 @@
     <script>
         // === 初始化：網頁載入時從 localStorage 讀取所有動態資料 ===
         window.onload = function() {
-            // 1. 讀取形象與暱稱
+            // 💡 安全防護：檢查是否有 UID，若無則代表未登入，強制踢回登入頁面
+            if (!localStorage.getItem('playerUID')) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            // 1. 讀取形象、暱稱與真實 UID
             const savedAvatar = localStorage.getItem('playerAvatar');
             if (savedAvatar) {
                 document.getElementById('main-avatar').src = savedAvatar;
@@ -227,6 +237,11 @@
             if (savedName) {
                 document.getElementById('main-username').innerText = savedName;
                 document.getElementById('modal-username').innerText = savedName;
+            }
+            // 將名片中的 UID 替換成真正的玩家帳號 UID
+            const savedUID = localStorage.getItem('playerUID');
+            if (savedUID) {
+                document.getElementById('dynamic-uid').innerText = "UID: " + savedUID;
             }
 
             // 2. 讀取核心數據（如果沒有儲存過，就給予預設值）
@@ -298,6 +313,14 @@
             document.body.style.opacity = 0;
             setTimeout(() => { window.location.href = 'arena.html'; }, 500);
         }
+        
+        // 💡 點擊「卡牌編輯」跳轉到我們剛寫好的 deck.html
+        function enterDeck() {
+            document.body.style.opacity = 0;
+            setTimeout(() => { window.location.href = 'deck.html'; }, 500);
+        }
+
+        // 點擊返回星盤，會回到登入畫面
         function goBack() {
             document.body.style.opacity = 0;
             setTimeout(() => { window.location.href = 'index.html'; }, 500);
@@ -319,5 +342,4 @@
         }
     </script>
 </body>
-</html>
 </html>
