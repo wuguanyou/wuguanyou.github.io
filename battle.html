@@ -180,7 +180,7 @@
         // === 聯網核心：讀取網頁房號參數與 WebSocket 設定 ===
         const urlParams = new URLSearchParams(window.location.search);
         const roomId = urlParams.get('room');
-        const ws = new WebSocket('ws://localhost:8765');
+        const ws = new WebSocket('wss://suction-swimmable-comment.ngrok-free.dev');
 
         // === 網頁載入與資料初始化 ===
         window.onload = function() {
