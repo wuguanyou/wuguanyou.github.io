@@ -1,1 +1,182 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>星宿魔法師 - 卡牌編輯</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
+        body {
+            background-color: #050a14;
+            background-image: radial-gradient(circle at 50% 50%, #1a2a40 0%, #050a14 100%);
+            color: #fff; font-family: 'Noto Serif TC', serif;
+            min-height: 100vh; padding: 30px;
+        }
 
+        .header { text-align: center; margin-bottom: 30px; }
+        .title { font-size: 32px; color: #ffd700; letter-spacing: 4px; text-shadow: 0 0 10px rgba(255,215,0,0.5); }
+        .subtitle { color: #5bc0eb; margin-top: 10px; font-size: 16px; }
+
+        /* 卡牌庫網格 */
+        .card-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px; max-width: 900px; margin: 0 auto;
+        }
+
+        /* 單張卡牌設計 */
+        .card {
+            background: linear-gradient(135deg, #2a3a50, #152030);
+            border: 2px solid #4a5a70; border-radius: 10px;
+            padding: 15px; text-align: center; cursor: pointer;
+            transition: all 0.3s; position: relative;
+        }
+        .card:hover { transform: translateY(-5px); box-shadow: 0 5px 15px rgba(91,192,235,0.4); }
+        
+        .card.selected {
+            border-color: #ffd700; background: linear-gradient(135deg, #3a4a20, #253010);
+            box-shadow: 0 0 20px rgba(255,215,0,0.4); transform: scale(1.05);
+        }
+
+        .card-name { font-weight: bold; font-size: 18px; margin-bottom: 10px; color: #fff; }
+        .card-stats { display: flex; justify-content: space-around; color: #ddd; font-size: 14px; }
+        .stat-atk { color: #ff6b6b; font-weight: bold; }
+        .stat-hp { color: #51cf66; font-weight: bold; }
+
+        /* 已選數量提示 */
+        .selection-badge {
+            position: absolute; top: -10px; right: -10px;
+            background: #ffd700; color: #000; width: 25px; height: 25px;
+            border-radius: 50%; font-weight: bold; display: none;
+            align-items: center; justify-content: center;
+        }
+        .card.selected .selection-badge { display: flex; }
+
+        /* 底部控制區 */
+        .controls {
+            position: fixed; bottom: 0; left: 0; width: 100%;
+            background: rgba(5, 10, 20, 0.9); padding: 20px;
+            display: flex; justify-content: center; gap: 20px;
+            border-top: 1px solid rgba(255,215,0,0.3); backdrop-filter: blur(5px);
+        }
+        button {
+            padding: 12px 30px; font-size: 18px; font-weight: bold; border-radius: 30px;
+            cursor: pointer; transition: 0.3s; border: none; font-family: inherit;
+        }
+        .save-btn { background: #ffd700; color: #050a14; }
+        .save-btn:hover { background: #ffea00; box-shadow: 0 0 15px rgba(255,215,0,0.6); }
+        .save-btn:disabled { background: #555; color: #888; cursor: not-allowed; box-shadow: none; }
+        
+        .back-btn { background: transparent; color: #fff; border: 1px solid #fff; }
+        .back-btn:hover { background: rgba(255,255,255,0.1); }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1 class="title">星宿編隊</h1>
+        <div class="subtitle" id="status-text">請選擇 4 名角色出戰 (目前: 0 / 4)</div>
+    </div>
+
+    <!-- 卡牌庫 (這裡可以擴充更多角色) -->
+    <div class="card-grid" id="card-pool">
+        <!-- 角色卡片會由 JS 動態生成 -->
+    </div>
+
+    <div class="controls">
+        <button class="back-btn" onclick="goBack()">返回大廳</button>
+        <button class="save-btn" id="save-btn" onclick="saveDeck()" disabled>確認編隊</button>
+    </div>
+
+    <script>
+        // 系統內建的角色庫設定
+        const availableCards = [
+            { id: "c1", name: "赤焰劍士", atk: 3, hp: 4, type: "warrior" },
+            { id: "c2", name: "星光法師", atk: 4, hp: 2, type: "mage" },
+            { id: "c3", name: "重甲護衛", atk: 1, hp: 7, type: "tank" },
+            { id: "c4", name: "暗影刺客", atk: 5, hp: 1, type: "assassin" },
+            { id: "c5", name: "治癒祭司", atk: 1, hp: 4, type: "support" },
+            { id: "c6", name: "雷霆射手", atk: 3, hp: 3, type: "archer" }
+        ];
+
+        let selectedCards = [];
+
+        // 1. 初始化卡池畫面
+        function initCardPool() {
+            const pool = document.getElementById('card-pool');
+            // 讀取之前儲存的陣容
+            const savedDeck = JSON.parse(localStorage.getItem('playerDeck')) || [];
+            selectedCards = savedDeck.map(card => card.id);
+
+            availableCards.forEach(card => {
+                const isSelected = selectedCards.includes(card.id);
+                const cardDiv = document.createElement('div');
+                cardDiv.className = `card ${isSelected ? 'selected' : ''}`;
+                cardDiv.dataset.id = card.id;
+                cardDiv.onclick = () => toggleSelection(cardDiv, card);
+                
+                cardDiv.innerHTML = `
+                    <div class="selection-badge">✓</div>
+                    <div class="card-name">${card.name}</div>
+                    <div class="card-stats">
+                        <span class="stat-atk">⚔️ ${card.atk}</span>
+                        <span class="stat-hp">❤️ ${card.hp}</span>
+                    </div>
+                `;
+                pool.appendChild(cardDiv);
+            });
+            updateStatus();
+        }
+
+        // 2. 點擊卡牌選取/取消邏輯
+        function toggleSelection(element, cardInfo) {
+            const index = selectedCards.indexOf(cardInfo.id);
+            
+            if (index > -1) {
+                // 取消選取
+                selectedCards.splice(index, 1);
+                element.classList.remove('selected');
+            } else {
+                // 新增選取 (限制最多 4 隻)
+                if (selectedCards.length >= 4) {
+                    alert("隊伍已經滿了！請先取消其他角色。");
+                    return;
+                }
+                selectedCards.push(cardInfo.id);
+                element.classList.add('selected');
+            }
+            updateStatus();
+        }
+
+        // 3. 更新狀態文字與按鈕
+        function updateStatus() {
+            document.getElementById('status-text').innerText = `請選擇 4 名角色出戰 (目前: ${selectedCards.length} / 4)`;
+            const saveBtn = document.getElementById('save-btn');
+            if (selectedCards.length === 4) {
+                saveBtn.disabled = false;
+            } else {
+                saveBtn.disabled = true;
+            }
+        }
+
+        // 4. 儲存編隊並返回
+        function saveDeck() {
+            if (selectedCards.length !== 4) return;
+            
+            // 找出選中的角色完整資料並存檔
+            const finalDeck = availableCards.filter(c => selectedCards.includes(c.id));
+            localStorage.setItem('playerDeck', JSON.stringify(finalDeck));
+            
+            alert("✅ 編隊儲存成功！");
+            window.location.href = 'game.html';
+        }
+
+        function goBack() {
+            window.location.href = 'game.html';
+        }
+
+        // 啟動
+        initCardPool();
+    </script>
+</body>
+</html>
