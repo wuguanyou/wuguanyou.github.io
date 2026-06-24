@@ -222,7 +222,7 @@
         // === 網路訊息接收與分發 ===
         ws.onmessage = (event) => {
             const data = JSON.parse(event.data);
-            
+            console.log("收到伺服器訊息:", data);
             // 💡 收到後端配發的對手資料，渲染真實對手
             if (data.action === "battle_start") {
                 document.getElementById('enemy-master-name').innerText = data.opp_name;
